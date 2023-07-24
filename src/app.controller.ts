@@ -3,10 +3,30 @@ import { Controller, Get, Request, Post, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth/auth.service';
+import { Strategy as EthStrategy, SessionNonceStore } from 'passport-ethereum-siwe';
+import * as util from 'util';
 
 @Controller()
 export class AppController {
   constructor(private authService: AuthService) { }
+
+  @Get('challenge')
+  async getChallenge(@Request() req) {
+    const store = new SessionNonceStore();
+    console.log(req.session);
+
+    const nonce = await new Promise((resolve, reject) => {
+      store.challenge(req, (err, nonce) => {
+        if (err) { reject(err); }
+        console.log('get challenge', err, nonce);
+        resolve(nonce);
+      });
+    });
+
+    // res.json({ nonce: nonce });
+    // return nonce; // same but not json
+    return req.session['ethereum:siwe'];
+  }
 
   @UseGuards(AuthGuard('ethereum'))
   @Post('auth/ethlogin')
