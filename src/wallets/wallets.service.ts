@@ -7,5 +7,8 @@ import { Wallet, WalletDocument } from './schemas/wallet.schema';
 export class WalletsService {
   constructor(@InjectModel(Wallet.name) private walletModel: Model<WalletDocument>) {}
 
-  // Add methods here as needed
+  async create(wallet: Wallet) {
+    const createdWallet = new this.walletModel(wallet);
+    return createdWallet.save();
+  }
 }
