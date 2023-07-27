@@ -44,7 +44,7 @@ export class AppController {
     return this.authService.login(req.user);
   }
 
-  @UseGuards(AuthGuard('local'))
+  // @UseGuards(AuthGuard('local'))
   @Post('genGmWallet')
   async genGmWallet() {
     await this.xmtpService.genGmWallet();

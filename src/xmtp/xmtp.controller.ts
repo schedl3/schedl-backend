@@ -6,7 +6,7 @@ import { AuthGuard } from '@nestjs/passport';
 export class XmtpController {
   constructor(private readonly xmtpService: XmtpService) {}
 
-  @UseGuards(AuthGuard('local'))
+  // @UseGuards(AuthGuard('local'))
   @Post('genGmWallet')
   async genGmWallet() {
     await this.xmtpService.genGmWallet();
