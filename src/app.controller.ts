@@ -3,12 +3,16 @@ import { Controller, Get, Request, Post, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth/auth.service';
+import { XmtpService } from './xmtp/xmtp.service';
 import { Strategy as EthStrategy, SessionNonceStore } from 'passport-ethereum-siwe';
 import * as util from 'util';
 
 @Controller()
 export class AppController {
-  constructor(private authService: AuthService) { }
+  constructor(
+    private authService: AuthService,
+    private xmtpService: XmtpService,
+  ) { }
 
   @Get('challenge')
   async getChallenge(@Request() req) {
@@ -38,6 +42,12 @@ export class AppController {
   @Post('auth/login')
   async login(@Request() req) {
     return this.authService.login(req.user);
+  }
+
+  @UseGuards(AuthGuard('local'))
+  @Post('genGmWallet')
+  async genGmWallet() {
+    await this.xmtpService.genGmWallet();
   }
 
   @UseGuards(JwtAuthGuard)
