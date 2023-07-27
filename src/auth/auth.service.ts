@@ -27,7 +27,7 @@ export class AuthService {
   }
 
   async ethlogin(user: any) {
-    // const payload = { username: user.username, sub: user.userId };
-    return 'OK';
+    const { password = null, ...userWithoutPassword } = user;
+    return userWithoutPassword;
   }
 }
