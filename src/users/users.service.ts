@@ -11,6 +11,11 @@ export class UsersService {
     return this.userModel.findOne({ idAddress });
   }
 
+  async create(user: Partial<UserDocument>): Promise<User> {
+    const newUser = new this.userModel(user);
+    return newUser.save();
+  }
+
   async createSampleUsers(): Promise<void> {
     const users = [
       { idAddress: 'id1', ethereumAddress: 'eth1', emailAddress: 'user1@example.com', description: 'User 1', password: 'password1' },
@@ -19,8 +24,7 @@ export class UsersService {
     ];
 
     for (const user of users) {
-      const newUser = new this.userModel(user);
-      await newUser.save();
+      await this.create(user);
     }
   }
 
