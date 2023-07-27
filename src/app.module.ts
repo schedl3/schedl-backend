@@ -4,6 +4,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { CatsModule } from './cats/cats.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { XmtpModule } from './xmtp/xmtp.module';
+import { XmtpService } from './xmtp/xmtp.service';
 import { AppController } from './app.controller';
 import * as session from 'express-session';
 import * as connectMongoDbSession from 'connect-mongodb-session';
@@ -25,7 +27,9 @@ const MongoDBStore = connectMongoDbSession(session);
     CatsModule,
     AuthModule,
     UsersModule,
+    XmtpModule,
   ],
   controllers: [AppController],
+  providers: [XmtpService],
 })
 export class AppModule {}
