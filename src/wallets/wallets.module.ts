@@ -8,5 +8,6 @@ import { Wallet, WalletSchema } from './schemas/wallet.schema';
   imports: [MongooseModule.forFeature([{ name: Wallet.name, schema: WalletSchema }])],
   providers: [WalletsService],
   controllers: [WalletsController],
+  exports: [WalletsService],
 })
 export class WalletsModule {}
