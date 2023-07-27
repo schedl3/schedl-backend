@@ -5,6 +5,7 @@ import { CatsModule } from './cats/cats.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { XmtpModule } from './xmtp/xmtp.module';
+import { WalletsModule } from './wallets/wallets.module';
 import { XmtpService } from './xmtp/xmtp.service';
 import { AppController } from './app.controller';
 import * as session from 'express-session';
