@@ -29,6 +29,7 @@ const MongoDBStore = connectMongoDbSession(session);
     AuthModule,
     UsersModule,
     XmtpModule,
+    WalletsModule,
   ],
   controllers: [AppController],
   providers: [XmtpService],
