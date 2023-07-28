@@ -27,9 +27,4 @@ export class XmtpService {
     console.log("Message sent", message);
   }
 }
-    // will block
-    // for await (const message of await xmtp.conversations.streamAllMessages()) {
-    //   console.log(`New message from ${message.senderAddress}: ${message.content}`);
-    // }
-  }
-}
+
