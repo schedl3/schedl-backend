@@ -11,7 +11,7 @@ export class WalletsService {
   constructor(
     @InjectModel(Wallet.name) private walletModel: Model<WalletDocument>,
     private httpService: HttpService,
-  ) {}
+  ) { }
 
   async create(wallet: Wallet) {
     const createdWallet = new this.walletModel(wallet);
@@ -22,7 +22,7 @@ export class WalletsService {
     return await this.walletModel.findOne().sort({ _id: -1 }).exec();
   }
 
-async testEthLogin() {
+  async testEthLogin() {
     const latestWallet = await this.getLatestWallet();
     const wallet = new ethers.Wallet(latestWallet.privateKey);
 
