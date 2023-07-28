@@ -11,6 +11,12 @@ export class UsersService {
     return this.userModel.findOne({ idAddress });
   }
 
+  async setUsername(user: User, username: string): Promise<User> {
+    user.username = username;
+    // await user.save();
+    return user;
+  }
+
   async create(user: Partial<UserDocument>): Promise<User> {
     const newUser = new this.userModel(user);
     return newUser.save();

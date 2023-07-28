@@ -4,6 +4,7 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth/auth.service';
 import { XmtpService } from './xmtp/xmtp.service';
+import { UsersService } from './users/users.service';
 import { Strategy as EthStrategy, SessionNonceStore } from 'passport-ethereum-siwe';
 import * as util from 'util';
 
@@ -12,6 +13,7 @@ export class AppController {
   constructor(
     private authService: AuthService,
     private xmtpService: XmtpService,
+    private usersService: UsersService,  
   ) { }
 
   @Get('challenge')
@@ -55,5 +57,11 @@ export class AppController {
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('setUsername')
+  async setUsername(@Request() req) {
+    return this.usersService.setUsername(req.user, req.body.username);
   }
 }
