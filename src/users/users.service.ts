@@ -11,9 +11,13 @@ export class UsersService {
     return this.userModel.findOne({ idAddress });
   }
 
-  async setUsername(user: User, username: string): Promise<User> {
+  async setUsername(idAddress: string, username: string): Promise<User> {
+    const user = await this.findOne(idAddress);
+    if (!user) {
+      throw new Error('User not found');
+    }
     user.username = username;
-    // await user.save();
+    await this.userModel.updateOne({ idAddress }, { username });
     return user;
   }
 

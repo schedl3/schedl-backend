@@ -62,6 +62,6 @@ export class AppController {
   @UseGuards(JwtAuthGuard)
   @Post('setUsername')
   async setUsername(@Request() req) {
-    return this.usersService.setUsername(req.user, req.body.username);
+    return this.usersService.setUsername(req.user.idAddress, req.body.username);
   }
 }
