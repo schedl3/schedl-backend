@@ -24,7 +24,7 @@ export class WalletsService {
 
 async testEthLogin() {
     const latestWallet = await this.getLatestWallet();
-    const wallet = new ethers.Wallet(latestWallet._doc.privateKey); 
+    const wallet = new ethers.Wallet(latestWallet.privateKey);
 
     // Request the challenge
     const challengeResponse = await axios.get('http://localhost:3000/challenge', { withCredentials: true });
