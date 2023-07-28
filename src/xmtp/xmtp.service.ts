@@ -17,7 +17,9 @@ export class XmtpService {
     return wallet;
   }
 
-  async gm(wallet) {
+  async gm() {
+    const latestWallet = await this.walletsService.getLatestWallet();
+    const wallet = new ethers.Wallet(latestWallet.privateKey);
     let xmtpOpts = { env: "production" };
     const xmtp = await Client.create(wallet, { env: "production" });
     const WALLET_TO = '0x78a74b5D1A86704c573163C3aafB6e7234c9Da1e';

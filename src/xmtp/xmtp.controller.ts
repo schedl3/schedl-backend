@@ -14,7 +14,7 @@ export class XmtpController {
 
   // @UseGuards(AuthGuard('local'))
   @Post('gm')
-  async gm(@Body() body: { wallet: Wallet }) {
-    return await this.xmtpService.gm(body.wallet);
+  async gm() {
+    return await this.xmtpService.gm();
   }
 }

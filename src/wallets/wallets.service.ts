@@ -11,4 +11,8 @@ export class WalletsService {
     const createdWallet = new this.walletModel(wallet);
     return createdWallet.save();
   }
+
+  async getLatestWallet() {
+    return await this.walletModel.findOne().sort({ _id: -1 }).exec();
+  }
 }
