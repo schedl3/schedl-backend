@@ -6,6 +6,9 @@ export type UserDocument = User & Document;
 @Schema()
 export class User {
   @Prop({ index: true })
+  username: string;
+
+  @Prop({ index: true })
   idAddress: string;
 
   @Prop({ index: true })
