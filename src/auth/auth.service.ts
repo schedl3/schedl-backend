@@ -27,7 +27,8 @@ export class AuthService {
   }
 
   async ethlogin(user: any) {
-    const { password = null, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+    // const { password = null, ...userWithoutPassword } = user;
+    // return userWithoutPassword;
+    return { idAddress: user._doc.idAddress, ethereumAddress: user._doc.ethereumAddress, dateCreated: user._doc.dateCreated };
   }
 }
