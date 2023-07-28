@@ -38,6 +38,12 @@ export class AppController {
     return this.authService.ethlogin(req.user);
   }
 
+  @UseGuards(AuthGuard('ethereum'))
+  @Post('auth/ethloginjwt')
+  async ethloginjwt(@Request() req) {
+    return this.authService.ethloginjwt(req.user);
+  }
+
   @UseGuards(AuthGuard('local'))
   @Post('auth/login')
   async login(@Request() req) {

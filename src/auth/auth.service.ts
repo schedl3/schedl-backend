@@ -31,4 +31,12 @@ export class AuthService {
     // return userWithoutPassword;
     return { idAddress: user._doc.idAddress, ethereumAddress: user._doc.ethereumAddress, dateCreated: user._doc.dateCreated };
   }
+
+
+  async ethloginjwt(user: any) {
+    const payload = { idAddress: user._doc.idAddress, ethereumAddress: user._doc.ethereumAddress };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
+  }
 }
