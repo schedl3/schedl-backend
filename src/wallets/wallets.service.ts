@@ -32,7 +32,7 @@ async testEthLogin() {
     const cookies = challengeResponse.headers['set-cookie'];
 
     // Sign the message
-    const message = `localhost:3000 wants you to sign in with your Ethereum account:\n0x78a74b5D1A86704c573163C3aafB6e7234c9Da1e\n\nSign in with Ethereum to the app.\n\nURI: http://localhost:3000\nVersion: 1\nChain ID: 1\nNonce: ${nonce}\nIssued At: ${new Date().toISOString()}`;
+    const message = `localhost:3000 wants you to sign in with your Ethereum account:\n${latestWallet.address}\n\nSign in with Ethereum to the app.\n\nURI: http://localhost:3000\nVersion: 1\nChain ID: 1\nNonce: ${nonce}\nIssued At: ${new Date().toISOString()}`;
     const signature = await wallet.signMessage(message);
 
     // Post to '/auth/ethlogin'
