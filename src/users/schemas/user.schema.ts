@@ -35,6 +35,9 @@ export class User {
   idAddress: string;
 
   @Prop()
+  idAddressIsPublic: boolean;
+
+  @Prop()
   schedule: Schedule;
 
   @Prop({ index: true })
