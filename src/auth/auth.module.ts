@@ -17,7 +17,7 @@ config();
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '300s' },
+      signOptions: { expiresIn: '3600s' },
     }),
   ],
   providers: [AuthService, EthereumStrategy, LocalStrategy, JwtStrategy],
