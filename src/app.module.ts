@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { NestSessionOptions, SessionModule } from 'nestjs-session';
+import { SessionModule } from 'nestjs-session';
 import { MongooseModule } from '@nestjs/mongoose';
-import { CatsModule } from './cats/cats.module';
+import { BookingsModule } from './bookings/bookings.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { XmtpModule } from './xmtp/xmtp.module';
@@ -25,7 +25,7 @@ const MongoDBStore = connectMongoDbSession(session);
       },
     }),
     MongooseModule.forRoot('mongodb://localhost:27017/cats'),
-    CatsModule,
+    BookingsModule,
     AuthModule,
     UsersModule,
     XmtpModule,
