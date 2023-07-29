@@ -52,6 +52,9 @@ export class User {
   @Prop()
   timeZone: string;
 
+  @Prop()
+  assistantXmtpAddress: string;
+
   @Prop({ default: Date.now })
   dateCreated: Date;
 }

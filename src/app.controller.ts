@@ -66,6 +66,12 @@ export class AppController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Post('setAssistantXmtpAddress')
+  async setAssistantXmtpAddress(@Request() req) {
+    return this.usersService.setAssistantXmtpAddress(req.user.idAddress, req.body.assistantXmtpAddress);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post('updateSchedule')
   async updateSchedule(@Request() req) {
     return this.usersService.updateSchedule(req.user.idAddress, req.body.schedule);
