@@ -36,7 +36,7 @@ export class User {
 
   @Prop()
   schedule: Schedule;
-  
+
   @Prop({ index: true })
   ethereumAddress: string;
 
@@ -48,6 +48,9 @@ export class User {
 
   @Prop()
   password: string;
+
+  @Prop()
+  timeZone: string;
 
   @Prop({ default: Date.now })
   dateCreated: Date;
