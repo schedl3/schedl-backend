@@ -31,6 +31,16 @@ export class UsersService {
     return user;
   }
 
+  async setIdAddressIsPublic(idAddress: string, idAddressIsPublic: boolean): Promise<User> {
+    const user = await this.findOne(idAddress);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    user.idAddressIsPublic = idAddressIsPublic;
+    await this.userModel.updateOne({ idAddress }, { idAddressIsPublic });
+    return user;
+  }
+
   async create(user: Partial<UserDocument>): Promise<User> {
     const newUser = new this.userModel(user);
     return newUser.save();
