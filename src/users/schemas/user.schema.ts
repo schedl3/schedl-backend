@@ -3,6 +3,29 @@ import { Document } from 'mongoose';
 
 export type UserDocument = User & Document;
 
+class Schedule {
+  @Prop({ required: true })
+  Sun: string;
+
+  @Prop({ required: true })
+  Mon: string;
+
+  @Prop({ required: true })
+  Tue: string;
+
+  @Prop({ required: true })
+  Wed: string;
+
+  @Prop({ required: true })
+  Thu: string;
+
+  @Prop({ required: true })
+  Fri: string;
+
+  @Prop({ required: true })
+  Sat: string;
+}
+
 @Schema()
 export class User {
   @Prop({ index: true })
@@ -11,6 +34,9 @@ export class User {
   @Prop({ index: true })
   idAddress: string;
 
+  @Prop()
+  schedule: Schedule;
+  
   @Prop({ index: true })
   ethereumAddress: string;
 
