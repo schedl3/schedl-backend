@@ -64,4 +64,10 @@ export class AppController {
   async setUsername(@Request() req) {
     return this.usersService.setUsername(req.user.idAddress, req.body.username);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('updateSchedule')
+  async updateSchedule(@Request() req) {
+    return this.usersService.updateSchedule(req.user.idAddress, req.body.schedule);
+  }
 }

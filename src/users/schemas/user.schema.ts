@@ -3,7 +3,7 @@ import { Document } from 'mongoose';
 
 export type UserDocument = User & Document;
 
-class Schedule {
+export class Schedule {
   @Prop({ required: true })
   Sun: string;
 
