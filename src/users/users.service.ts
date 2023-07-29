@@ -41,6 +41,19 @@ export class UsersService {
     return user;
   }
 
+  async getProfileByUsername(username: string): Promise<Partial<User> | undefined> {
+    const user = await this.userModel.findOne({ username });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return {
+      username: user.username,
+      idAddress: user.idAddressIsPublic ? user.idAddress : undefined,
+      description: user.description,
+      schedule: user.schedule,
+    };
+  }
+
   async create(user: Partial<UserDocument>): Promise<User> {
     const newUser = new this.userModel(user);
     return newUser.save();

@@ -1,5 +1,5 @@
 
-import { Controller, Get, Request, Post, UseGuards } from '@nestjs/common';
+import { Controller, Get, Request, Post, UseGuards, Param } from '@nestjs/common';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth/auth.service';
@@ -82,5 +82,10 @@ export class AppController {
   async toggleIdAddressIsPublic(@Request() req) {
     const user = await this.usersService.findOne(req.user.idAddress);
     return this.usersService.setIdAddressIsPublic(req.user.idAddress, !user.idAddressIsPublic);
+  }
+
+  @Get('profile/:username')
+  async getProfileByUsername(@Param('username') username: string) {
+    return this.usersService.getProfileByUsername(username);
   }
 }
