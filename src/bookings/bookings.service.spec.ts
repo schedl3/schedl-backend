@@ -4,10 +4,14 @@ import { Model } from 'mongoose';
 import { BookingsService } from './bookings.service';
 import { booking } from './schemas/booking.schema';
 
+const nowish = new Date();
+
 const mockBooking = {
-  name: 'booking #1',
-  breed: 'Breed #1',
-  age: 4,
+  fromAddress: '0xbooking1',
+  toUsername: 'username1',
+  start: nowish,
+  minutes: 30,
+  msg: 'hello'
 };
 
 describe('BookingsService', () => {
@@ -16,14 +20,18 @@ describe('BookingsService', () => {
 
   const BookingsArray = [
     {
-      name: 'booking #1',
-      breed: 'Breed #1',
-      age: 4,
+      fromAddress: '0xbooking1',
+      toUsername: 'username1',
+      start: nowish,
+      minutes: 30,
+      msg: 'hello'
     },
     {
-      name: 'booking #2',
-      breed: 'Breed #2',
-      age: 2,
+      fromAddress: '0xbooking2',
+      toUsername: 'username2',
+      start: nowish,
+      minutes: 30,
+      msg: 'hello'
     },
   ];
 
@@ -63,15 +71,19 @@ describe('BookingsService', () => {
   it('should insert a new booking', async () => {
     jest.spyOn(model, 'create').mockImplementationOnce(() =>
       Promise.resolve({
-        name: 'booking #1',
-        breed: 'Breed #1',
-        age: 4,
+        fromAddress: '0xbooking1',
+        toUsername: 'username1',
+        start: nowish,
+        minutes: 30,
+        msg: 'hello'
       } as any),
     );
     const newBooking = await service.create({
-      name: 'booking #1',
-      breed: 'Breed #1',
-      age: 4,
+      fromAddress: '0xbooking1',
+      toUsername: 'username1',
+      start: nowish,
+      minutes: 30,
+      msg: 'hello'
     });
     expect(newBooking).toEqual(mockBooking);
   });

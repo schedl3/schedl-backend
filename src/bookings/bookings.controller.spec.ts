@@ -3,19 +3,25 @@ import { BookingsController } from './bookings.controller';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { BookingsService } from './bookings.service';
 
+const nowish = new Date();
+
 describe('Bookings Controller', () => {
   let controller: BookingsController;
   let service: BookingsService;
   const createBookingDto: CreateBookingDto = {
-    name: 'booking #1',
-    breed: 'Breed #1',
-    age: 4,
+    fromAddress: '0xbooking1',
+    toUsername: 'username1',
+    start: nowish,
+    minutes: 30,
+    msg: 'hello'
   };
 
   const mockBooking = {
-    name: 'booking #1',
-    breed: 'Breed #1',
-    age: 4,
+    fromAddress: '0xbooking1',
+    toUsername: 'username1',
+    start: nowish,
+    minutes: 30,
+    msg: 'hello',
     _id: 'a id',
   };
 
@@ -28,19 +34,25 @@ describe('Bookings Controller', () => {
           useValue: {
             findAll: jest.fn().mockResolvedValue([
               {
-                name: 'booking #1',
-                breed: 'Bread #1',
-                age: 4,
+                fromAddress: '0xbooking1',
+                toUsername: 'username1',
+                start: nowish,
+                minutes: 30,
+                msg: 'hello'
               },
               {
-                name: 'booking #2',
-                breed: 'Breed #2',
-                age: 3,
+                fromAddress: '0xbooking2',
+                toUsername: 'username2',
+                start: nowish,
+                minutes: 30,
+                msg: 'hello'
               },
               {
-                name: 'booking #3',
-                breed: 'Breed #3',
-                age: 2,
+                fromAddress: '0xbooking3',
+                toUsername: 'username3',
+                start: nowish,
+                minutes: 30,
+                msg: 'hello'
               },
             ]),
             create: jest.fn().mockResolvedValue(createBookingDto),
@@ -68,19 +80,25 @@ describe('Bookings Controller', () => {
     it('should return an array of bookings', async () => {
       expect(controller.findAll()).resolves.toEqual([
         {
-          name: 'booking #1',
-          breed: 'Bread #1',
-          age: 4,
+          fromAddress: '0xbooking1',
+          toUsername: 'username1',
+          start: nowish,
+          minutes: 30,
+          msg: 'hello'
         },
         {
-          name: 'booking #2',
-          breed: 'Breed #2',
-          age: 3,
+          fromAddress: '0xbooking2',
+          toUsername: 'username2',
+          start: nowish,
+          minutes: 30,
+          msg: 'hello'
         },
         {
-          name: 'booking #3',
-          breed: 'Breed #3',
-          age: 2,
+          fromAddress: '0xbooking3',
+          toUsername: 'username3',
+          start: nowish,
+          minutes: 30,
+          msg: 'hello'
         },
       ]);
       expect(service.findAll).toHaveBeenCalled();

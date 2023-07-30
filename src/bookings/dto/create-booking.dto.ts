@@ -1,5 +1,7 @@
 export class CreateBookingDto {
-  readonly name: string;
-  readonly age: number;
-  readonly breed: string;
+  readonly fromAddress: string;
+  readonly toUsername: string;
+  readonly start: Date;
+  readonly minutes: number;
+  readonly msg: string;
 }

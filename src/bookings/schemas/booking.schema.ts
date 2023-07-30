@@ -6,13 +6,20 @@ export type BookingDocument = HydratedDocument<booking>;
 @Schema()
 export class booking {
   @Prop()
-  name: string;
+  fromAddress: string;
 
   @Prop()
-  age: number;
+  toUsername: string;
+  
+  @Prop()
+  start: Date;
 
   @Prop()
-  breed: string;
+  minutes: number;
+
+  @Prop()
+  msg: string;
+  
 }
 
 export const BookingSchema = SchemaFactory.createForClass(booking);
