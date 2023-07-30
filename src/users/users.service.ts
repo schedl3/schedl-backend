@@ -58,6 +58,10 @@ export class UsersService {
     return this.userModel.findOne({ idAddress });
   }
 
+  async findOneUsername(username: string): Promise<User | undefined> {
+    return this.userModel.findOne({ username });
+  }
+
   async setUsername(idAddress: string, username: string): Promise<User> {
     const user = await this.findOne(idAddress);
     if (!user) {
@@ -125,12 +129,12 @@ export class UsersService {
   async createSampleUsers(): Promise<void> {
     const users = [
       {
-        idAddress: 'id1',
-        ethereumAddress: 'eth1',
+        idAddress: '0x78a74b5D1A86704c573163C3aafB6e7234c9Da1e',
+        ethereumAddress: '0x78a74b5D1A86704c573163C3aafB6e7234c9Da1e',
         emailAddress: 'user1@example.com',
-        description: 'User 1',
+        description: 'SuperUser 1',
         password: 'password1',
-        username: 'user1',
+        username: 'superuser',
         timeZone: 'America/New_York',
         schedule: {
           Sun: '',
