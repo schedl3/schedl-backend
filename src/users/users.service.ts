@@ -1,7 +1,54 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import * as Joi from 'joi';
 import { User, UserDocument, Schedule } from './schemas/user.schema';
+
+// e.g. "8-11:30,13-16"
+function validateTimeLogic(value: string): boolean {
+  let prevEndTime = 0.0;
+
+  const timeSlots = value.split(",");
+  for (let timeSlot of timeSlots) {
+    let times = timeSlot.split("-");
+    let startTime = parseFloat(times[0].replace(":", "."));
+    let endTime = parseFloat(times[1].replace(":", "."));
+
+    // Validation 1: start time must be before end time
+    if (startTime >= endTime) {
+      return false;
+    }
+
+    // Validation 2: no overlaps and times are in order
+    if (prevEndTime > startTime) {
+      return false;
+    }
+    prevEndTime = endTime;
+  }
+
+  return true; // return true if all conditions are met
+}
+
+const timeSlotSchema = Joi.string()
+  .empty('') // Allow empty strings
+  .pattern(/\b([01]?[0-9]|2[0-3])(:[0-5][0-9])?-[01]?[0-9]|2[0-3](:[0-5][0-9])?(,([01]?[0-9]|2[0-3])(:[0-5][0-9])?-([01]?[0-9]|2[0-3])(:[0-5][0-9])?)*\b/)
+  .custom((value, helpers) => {
+    if (!validateTimeLogic(value)) {
+      return helpers.error('any.invalid');
+    }
+    return value;
+  }, 'Time slots validation');
+
+// Schema for validating schedule
+const schema = Joi.object({
+  Sun: timeSlotSchema,
+  Mon: timeSlotSchema,
+  Tue: timeSlotSchema,
+  Wed: timeSlotSchema,
+  Thu: timeSlotSchema,
+  Fri: timeSlotSchema,
+  Sat: timeSlotSchema
+}).required()
 
 @Injectable()
 export class UsersService {
@@ -64,6 +111,12 @@ export class UsersService {
     if (!user) {
       throw new Error('User not found');
     }
+    const { error, value } = schema.validate(schedule);
+    if (error) {
+      console.log('Validation error:', error.details[0].message);
+      throw new Error('Invalid schedule');
+    }
+
     user.schedule = schedule;
     await this.userModel.updateOne({ idAddress }, { schedule });
     return user;
@@ -71,11 +124,11 @@ export class UsersService {
 
   async createSampleUsers(): Promise<void> {
     const users = [
-      { 
-        idAddress: 'id1', 
-        ethereumAddress: 'eth1', 
-        emailAddress: 'user1@example.com', 
-        description: 'User 1', 
+      {
+        idAddress: 'id1',
+        ethereumAddress: 'eth1',
+        emailAddress: 'user1@example.com',
+        description: 'User 1',
         password: 'password1',
         username: 'user1',
         timeZone: 'America/New_York',
@@ -89,11 +142,11 @@ export class UsersService {
           Sat: '9-11:30',
         },
       },
-      { 
-        idAddress: 'id2', 
-        ethereumAddress: 'eth2', 
-        emailAddress: 'user2@example.com', 
-        description: 'User 2', 
+      {
+        idAddress: 'id2',
+        ethereumAddress: 'eth2',
+        emailAddress: 'user2@example.com',
+        description: 'User 2',
         password: 'password2',
         username: 'user2',
         timeZone: 'UTC',

@@ -29,6 +29,8 @@
     "connect-mongodb-session": "^3.1.1",
     "dotenv": "^16.3.1",
     "ethers": "^5.7.0",
+    "joi": "^17.9.2",
+    "luxon": "^3.3.0",
     "mongoose": "7.3.1",
     "nestjs-session": "^2.0.0",
     "passport": "^0.6.0",
