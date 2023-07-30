@@ -28,10 +28,10 @@ export class Schedule {
 
 @Schema()
 export class User {
-  @Prop({ index: true })
+  @Prop({ index: true, unique: true })
   username: string;
 
-  @Prop({ index: true })
+  @Prop({ index: true, unique: true })
   idAddress: string;
 
   @Prop()
