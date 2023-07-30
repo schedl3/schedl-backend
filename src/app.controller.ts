@@ -3,6 +3,7 @@ import { Controller, Get, Request, Post, UseGuards, Param } from '@nestjs/common
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth/auth.service';
+import { BookingsService } from './bookings/bookings.service';
 import { XmtpService } from './xmtp/xmtp.service';
 import { UsersService } from './users/users.service';
 import { Strategy as EthStrategy, SessionNonceStore } from 'passport-ethereum-siwe';
@@ -12,6 +13,7 @@ import * as util from 'util';
 export class AppController {
   constructor(
     private authService: AuthService,
+    private bookingsService: BookingsService,
     private xmtpService: XmtpService,
     private usersService: UsersService,  
   ) { }

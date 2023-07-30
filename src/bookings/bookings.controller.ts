@@ -1,29 +1,35 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { AuthGuard } from '@nestjs/passport';
 import { BookingsService } from './bookings.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
-import { booking } from './schemas/booking.schema';
+import { Booking } from './schemas/booking.schema';
 
 @Controller('bookings')
 export class BookingsController {
-  constructor(private readonly BookingsService: BookingsService) {}
+  constructor(private readonly bookingsService: BookingsService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Body() createBookingDto: CreateBookingDto) {
-    await this.BookingsService.create(createBookingDto);
+    await this.bookingsService.create(createBookingDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
-  async findAll(): Promise<booking[]> {
-    return this.BookingsService.findAll();
+  async findAll(): Promise<Booking[]> {
+    return this.bookingsService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<booking> {
-    return this.BookingsService.findOne(id);
+  async findOne(@Param('id') id: string): Promise<Booking> {
+    return this.bookingsService.findOne(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async delete(@Param('id') id: string) {
-    return this.BookingsService.delete(id);
+    return this.bookingsService.delete(id);
   }
 }
