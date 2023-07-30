@@ -1,11 +1,13 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards, CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseGuards, Request, CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { CustomAuthGuard } from '../auth/auth.guard';
 import { BookingsService } from './bookings.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { Booking } from './schemas/booking.schema';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Injectable()
-export class SuperUserGuard extends AuthGuard('jwt') implements CanActivate {
+export class SuperUserGuard extends CustomAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     // call AuthGuard in order to ensure user is injected in request
     const baseGuardResult = await super.canActivate(context);
@@ -18,14 +20,14 @@ export class SuperUserGuard extends AuthGuard('jwt') implements CanActivate {
     const user = request.user; // This will be the user object returned from Passport's JwtStrategy
     console.log(user);
 
-    if (user && user.idAddress === '0x78a74b5D1A86704c573163C3aafB6e7234c9Da1e') {
-      return true;
-    }
-    // XXX username missing
-    // const desiredUserId = 'superuser';
-    // if (user && user.id === desiredUserId) {
+    // if (user && user.idAddress === '0x78a74b5D1A86704c573163C3aafB6e7234c9Da1e') {
     //   return true;
     // }
+    // XXX username missing unless extending CustomAuthGuard
+    const requiredUserId = 'superuser';
+    if (user && user.username === requiredUserId) {
+      return true;
+    }
 
     return false;
   }
@@ -57,5 +59,13 @@ export class BookingsController {
   @Delete(':id')
   async delete(@Param('id') id: string) {
     return this.bookingsService.delete(id);
+  }
+
+  @Post('request')
+  @UseGuards(CustomAuthGuard)
+  makeRequest(@Request() req) {
+    const user = req.user;
+    console.log(user);
+    return `Hello, ${user.username}!`;
   }
 }
