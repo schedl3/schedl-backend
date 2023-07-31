@@ -34,7 +34,7 @@ export class AuthService {
 
 
   async ethloginjwt(user: any) {
-    const payload = { sub: user._doc.idAddress, idAddress: user._doc.idAddress, ethereumAddress: user._doc.idAddress };
+    const payload = { sub: user._doc.idAddress, idAddress: user._doc.idAddress, username: user._doc.username, ethereumAddress: user._doc.idAddress };
     return {
       access_token: this.jwtService.sign(payload),
     };

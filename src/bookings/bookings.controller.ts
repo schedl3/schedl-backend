@@ -1,11 +1,9 @@
-import { DateTime } from 'luxon';
 import { Body, Controller, Delete, Get, Param, Post, UseGuards, Request, CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { CustomAuthGuard } from '../auth/auth.guard';
 import { BookingsService } from './bookings.service';
 import { UsersService } from '../users/users.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { Booking } from './schemas/booking.schema';
-import { Schedule } from '../users/schemas/user.schema';
 
 @Injectable()
 export class SuperUserGuard extends CustomAuthGuard implements CanActivate {
@@ -32,56 +30,6 @@ export class SuperUserGuard extends CustomAuthGuard implements CanActivate {
 
     return false;
   }
-}
-
-function isMeetingScheduled(
-  schedule: Schedule,
-  meetingTimestamp: number,
-  lengthMinutes: number,
-  timezone?: string
-): boolean {
-  // Check if length minutes is valid (15, 30, or 60 minutes)
-  if (![15, 30, 60].includes(lengthMinutes)) {
-    throw new Error("Invalid length minutes. Please provide 15, 30, or 60 minutes.");
-  }
-
-  // Convert meeting timestamp to the specified timezone (or use UTC if timezone is not provided)
-  const meetingDateTime = timezone
-    ? DateTime.fromMillis(meetingTimestamp, { zone: timezone })
-    : DateTime.fromMillis(meetingTimestamp, { zone: 'utc' });
-
-  // Check if meeting timestamp's minutes modulo length minutes is 0
-  if (meetingDateTime.minute % lengthMinutes !== 0) {
-    return false;
-  }
-
-  const meetingDate = meetingDateTime.toFormat('yyyy-MM-dd');
-
-  // Get the day of the week for the meeting in the specified timezone
-  const meetingDay = meetingDateTime.toFormat('EEE');
-
-  console.log(meetingDateTime.toFormat('EEEE, LLLL dd, yyyy, hh:mm a'));
-
-  // Check if the meeting timestamp is within one of the intervals scheduled for that day of the week
-  if (schedule[meetingDay]) {
-    const intervals = schedule[meetingDay].split(",");
-    for (const interval of intervals) {
-      const [startTime, endTime] = interval.split("-").map((time) => {
-        const [h, m] = time.split(':');
-        const fullTime = h.padStart(2, '0') + ':' + (m === undefined ? '00' : m);
-        const tstamp = DateTime.fromFormat(meetingDate + ' ' + fullTime, 'yyyy-MM-dd HH:mm');
-        const readableDate = tstamp.toFormat('EEEE, LLLL dd, yyyy, hh:mm a');
-        console.log(readableDate);
-        return tstamp.toMillis()
-      });
-      console.log(startTime, endTime, meetingTimestamp, lengthMinutes * 60000);
-      if (meetingTimestamp >= startTime && meetingTimestamp + lengthMinutes * 60000 <= endTime) {
-        return true;
-      }
-    }
-  }
-
-  return false;
 }
 
 @Controller('bookings')
@@ -118,25 +66,6 @@ export class BookingsController {
   @Post('request')
   @UseGuards(CustomAuthGuard)
   async makeRequest(@Request() req) {
-    const user = req.user;
-    const body = req.body;
-    const toUser = await this.usersService.findOneUsername(body.toUsername);
-    console.log(user);
-    console.log(toUser);
-    if (!toUser) {
-      throw new Error("User does not exist");
-    }
-
-    // check start time is in schedule
-    // convert a time string like 2023-07-30T08:00:00.000Z into a timestamp
-    const meetingTimestamp = Date.parse(body.start);
-    const lengthMinutes = body.minutes;
-    const timezone = body.timezone ? body.timezone : ''; // UTC by default?
-    const isScheduled = isMeetingScheduled(toUser.schedule, meetingTimestamp, lengthMinutes, timezone);
-    if (!isScheduled) {
-      throw new Error("Meeting time is not in schedule");
-    }
-
-    return `Hello, ${user.username}! You requested ${toUser.username}`;
+    return this.bookingsService.makeRequest(req.user, req.body);
   }
 }
