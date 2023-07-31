@@ -2,7 +2,7 @@ import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Model } from 'mongoose';
 import { BookingsService } from './bookings.service';
-import { booking } from './schemas/booking.schema';
+import { Booking } from './schemas/booking.schema';
 
 const nowish = new Date();
 
@@ -16,7 +16,7 @@ const mockBooking = {
 
 describe('BookingsService', () => {
   let service: BookingsService;
-  let model: Model<booking>;
+  let model: Model<Booking>;
 
   const BookingsArray = [
     {
@@ -40,7 +40,7 @@ describe('BookingsService', () => {
       providers: [
         BookingsService,
         {
-          provide: getModelToken('booking'),
+          provide: getModelToken('Booking'),
           useValue: {
             new: jest.fn().mockResolvedValue(mockBooking),
             constructor: jest.fn().mockResolvedValue(mockBooking),
@@ -53,7 +53,7 @@ describe('BookingsService', () => {
     }).compile();
 
     service = module.get<BookingsService>(BookingsService);
-    model = module.get<Model<booking>>(getModelToken('booking'));
+    model = module.get<Model<Booking>>(getModelToken('Booking'));
   });
 
   it('should be defined', () => {
