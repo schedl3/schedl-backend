@@ -1,4 +1,4 @@
-import { DateTime, IANAZone, Interval } from 'luxon';
+import { DateTime, Interval } from 'luxon';
 import { Injectable } from '@nestjs/common';
 import { InjectModel, getModelToken } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -27,7 +27,7 @@ function getOffsetFromBeginningOfWeek(day: string, hhmm: string) {
 //   { start: 105, end: 113.5 },
 //   { start: 129, end: 131.5 }
 // ]
-function getStartEndTimes(schedule) {
+function getStartEndTimes(schedule: Schedule) {
   const weekDays = Object.keys(schedule);
   const startEndTimesPerDay = {};
 
