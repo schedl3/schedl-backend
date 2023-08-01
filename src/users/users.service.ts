@@ -135,7 +135,7 @@ export class UsersService {
         description: 'SuperUser 1',
         password: 'password1',
         username: 'superuser',
-        timeZone: 'America/New_York',
+        tz: 'America/New_York',
         schedule: {
           Sun: '',
           Mon: '9-17:30',
@@ -153,7 +153,7 @@ export class UsersService {
         description: 'User 2',
         password: 'password2',
         username: 'user2',
-        timeZone: 'UTC',
+        tz: 'UTC',
         schedule: {
           Sun: '9-17:30',
           Mon: '',

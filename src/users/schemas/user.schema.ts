@@ -53,7 +53,7 @@ export class User {
   password: string;
 
   @Prop()
-  timeZone: string;
+  tz: string;
 
   @Prop()
   assistantXmtpAddress: string;
