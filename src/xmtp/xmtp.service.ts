@@ -5,7 +5,7 @@ import { WalletsService } from '../wallets/wallets.service';
 
 @Injectable()
 export class XmtpService {
-  constructor(private readonly walletsService: WalletsService) {}
+  constructor(private readonly walletsService: WalletsService) { }
 
   async genWallet() {
     const wallet = ethers.Wallet.createRandom();
@@ -28,5 +28,43 @@ export class XmtpService {
     const message = await conversation.send("gm");
     console.log("Message sent", message);
   }
+
+  async sendMessageAwaitConfirmation(msg: string, addressToSendTo: string, onConfirmation: (newStatus: string) => void) {
+    const latestWallet = await this.walletsService.getLatestWallet();
+    const wallet = new ethers.Wallet(latestWallet.privateKey);
+    let xmtpOpts = { env: "production" };
+    const xmtp = await Client.create(wallet, { env: "production" });
+    const isOnProdNetwork = await xmtp.canMessage(addressToSendTo);
+    console.log(addressToSendTo, "Can message: " + isOnProdNetwork);
+    if (!isOnProdNetwork) {
+      throw new Error("Address is not on production network");
+    }
+    const conversation = await xmtp.conversations.newConversation(addressToSendTo);
+    console.log("Conversation created", conversation);
+    const fullMsg = `Booking request from someone:\n\n${msg}\n\nReply with "confirm" or "reject"`
+    const message = await conversation.send(fullMsg);
+    console.log("Message sent", message);
+    let sent;
+    for await (const message of await xmtp.conversations.streamAllMessages()) {
+      console.log(`New message from ${message.senderAddress}: ${message.content}`);
+      // if (message.content === "Please reply with 'confirm' or 'reject'") {
+      if (sent && message.id == sent.id) {
+        console.log("Message sent", message.id);
+        continue;
+      }
+      if (message.content === 'confirm') {
+        conversation.send("Confirmed");
+        onConfirmation('confirmed');
+        return;
+      } else if (message.content === 'reject') {
+        conversation.send("Rejected");
+        onConfirmation('rejected');
+        return;
+      } else {
+        sent = await conversation.send("Please reply with 'confirm' or 'reject'");
+      }
+    }
+  }
+
 }
 

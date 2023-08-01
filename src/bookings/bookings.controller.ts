@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, UseGuards, Request, CanActi
 import { CustomAuthGuard } from '../auth/auth.guard';
 import { BookingsService } from './bookings.service';
 import { UsersService } from '../users/users.service';
+import { XmtpService } from '../xmtp/xmtp.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { Booking } from './schemas/booking.schema';
 
@@ -37,6 +38,7 @@ export class BookingsController {
   constructor(
     private readonly bookingsService: BookingsService,
     private readonly usersService: UsersService,
+    private readonly xmtpService: XmtpService,
   ) { }
 
   @UseGuards(SuperUserGuard)

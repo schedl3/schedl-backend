@@ -10,7 +10,7 @@ export type BookingDocument = HydratedDocument<Booking>;
 export class Booking {
   @Prop({
     type: String,
-    enum: ['initial', 'notified', 'confirmed', 'busy'],
+    enum: ['initial', 'notified', 'confirmed', 'rejected', 'busy'],
     default: 'initial'
   })
   status: string;

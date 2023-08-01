@@ -3,9 +3,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel, getModelToken } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateBookingDto } from './dto/create-booking.dto';
-import { Booking } from './schemas/booking.schema';
+import { Booking, BookingDocument } from './schemas/booking.schema';
 import { Schedule } from '../users/schemas/user.schema';
 import { UsersService } from '../users/users.service';
+import { XmtpService } from '../xmtp/xmtp.service';
 
 // Given a day and a time return the number of hours from the beginning of the week.
 function getOffsetFromBeginningOfWeek(day: string, hhmm: string) {
@@ -79,11 +80,9 @@ function normalizeTzOffset(times, offset) {
 export class BookingsService {
   constructor(
     @InjectModel(Booking.name) private readonly BookingModel: Model<Booking>,
-    // make the users service available to the bookings service:
-    private readonly usersService: UsersService,
-
-  ) { }
-
+    private usersService: UsersService,
+    private xmtpService: XmtpService,
+  ) {}
   async create(createBookingDto: CreateBookingDto): Promise<Booking> {
     const createdBooking = await this.BookingModel.create(createBookingDto);
     return createdBooking;
@@ -149,6 +148,20 @@ export class BookingsService {
       msg: body.msg,
     }
     const createdBooking = await this.BookingModel.create(booking);
-    return `Hello, ${user.username}! You requested ${toUser.username}`;
+    const updateStatusToConfirmed = async (newStatus: string) => {
+      if (newStatus !== 'confirmed' && newStatus !== 'rejected') {
+        throw new Error(`Invalid status: ${newStatus}`);
+      }
+      try {
+        createdBooking.status = newStatus;
+        await createdBooking.save();
+        console.log(`Booking with ID ${createdBooking._id} status updated to ${newStatus}.`);
+      } catch (error) {
+        console.error(`Error updating booking status: ${error}`);
+      }
+    }
+    // TODO sanitize xmtp message
+    this.xmtpService.sendMessageAwaitConfirmation(body.msg, toUser.idAddress, updateStatusToConfirmed);
+    return `Hello, ${user.username}! You requested ${toUser.username}. Check status at /bookings/${createdBooking._id}`;
   }
 }
