@@ -29,6 +29,22 @@ export class XmtpService {
     console.log("Message sent", message);
   }
 
+  async sendMessage(msg: string, addressToSendTo: string) {
+    const latestWallet = await this.walletsService.getLatestWallet();
+    const wallet = new ethers.Wallet(latestWallet.privateKey);
+    let xmtpOpts = { env: "production" };
+    const xmtp = await Client.create(wallet, { env: "production" });
+    const isOnProdNetwork = await xmtp.canMessage(addressToSendTo);
+    console.log(addressToSendTo, "Can message: " + isOnProdNetwork);
+    if (!isOnProdNetwork) {
+      throw new Error("Address is not on production network");
+    }
+    const conversation = await xmtp.conversations.newConversation(addressToSendTo);
+    console.log("Conversation created", conversation);
+    const message = await conversation.send(msg);
+    console.log("Message sent", message);
+  }
+
   async sendMessageAwaitConfirmation(msg: string, addressToSendTo: string, onConfirmation: (newStatus: string) => void) {
     const latestWallet = await this.walletsService.getLatestWallet();
     const wallet = new ethers.Wallet(latestWallet.privateKey);

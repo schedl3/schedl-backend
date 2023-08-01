@@ -20,7 +20,7 @@ export class AuthService {
 
   async login(user: any) {
     // const payload = { username: user.username, sub: user.userId };
-    const payload = { sub: user._doc.idAddress, idAddress: user._doc.idAddress, username: user._doc.username, ethereumAddress: user._doc.ethereumAddress };
+    const payload = { sub: user._doc.idAddress, idAddress: user._doc.idAddress, username: user._doc.username, assistantXmtpAddress: user._doc.assistantXmtpAddress, ethereumAddress: user._doc.ethereumAddress };
     return {
       access_token: this.jwtService.sign(payload),
     };
@@ -34,7 +34,8 @@ export class AuthService {
 
 
   async ethloginjwt(user: any) {
-    const payload = { sub: user._doc.idAddress, idAddress: user._doc.idAddress, username: user._doc.username, ethereumAddress: user._doc.idAddress };
+    // return this.login(user);
+    const payload = { sub: user._doc.idAddress, idAddress: user._doc.idAddress, username: user._doc.username, assistantXmtpAddress: user._doc.assistantXmtpAddress, ethereumAddress: user._doc.ethereumAddress };
     return {
       access_token: this.jwtService.sign(payload),
     };

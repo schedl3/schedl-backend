@@ -164,6 +164,7 @@ export class BookingsService {
         createdBooking.status = newStatus;
         await createdBooking.save();
         console.log(`Booking with ID ${createdBooking._id} status updated to ${newStatus}.`);
+        this.xmtpService.sendMessage(`Booking status updated to ${newStatus}.`, user.assistantXmtpAddress);
       } catch (error) {
         console.error(`Error updating booking status: ${error}`);
       }
