@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as Joi from 'joi';
 import { User, UserDocument, Schedule } from './schemas/user.schema';
+import { XmtpService } from '../xmtp/xmtp.service';
 
 // e.g. "8-11:30,13-16"
 function validateTimeLogic(value: string): boolean {
@@ -52,7 +53,10 @@ const schema = Joi.object({
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private xmtpService: XmtpService,
+  ) {}
 
   async findOne(idAddress: string): Promise<User | undefined> {
     return this.userModel.findOne({ idAddress });
@@ -82,8 +86,21 @@ export class UsersService {
     if (!user) {
       throw new Error('User not found');
     }
+    const updateAssIfConfirmed = async (newStatus: string) => {
+      if (newStatus !== 'confirmed') {
+        throw new Error(`Invalid status: ${newStatus}`);
+      }
+      try {
+        await this.userModel.updateOne({ idAddress }, { assistantXmtpAddress });
+        console.log(`Assistant XMTP address updated to ${assistantXmtpAddress}.`);
+      } catch (error) {
+        console.error(`Error updating address: ${error}`);
+      }
+    }
+    this.xmtpService.sendMessageAwaitConfirmation('SET-ASSISTANT', assistantXmtpAddress, updateAssIfConfirmed);
+
     user.assistantXmtpAddress = assistantXmtpAddress;
-    await this.userModel.updateOne({ idAddress }, { assistantXmtpAddress });
+    // await this.userModel.updateOne({ idAddress }, { assistantXmtpAddress });
     return user;
   }
 

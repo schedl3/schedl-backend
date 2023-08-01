@@ -41,8 +41,13 @@ export class XmtpService {
     }
     const conversation = await xmtp.conversations.newConversation(addressToSendTo);
     console.log("Conversation created", conversation);
-    const fullMsg = `Booking request from someone:\n\n${msg}\n\nReply with "confirm" or "reject"`
-    const message = await conversation.send(fullMsg);
+    let wrappedMsg;
+    if (msg == 'SET-ASSISTANT') {
+      wrappedMsg = `Set ASSISTANT request from someone:\n\n${msg}\n\nReply with "confirm" or "reject"`
+    } else {
+      wrappedMsg = `Booking request from someone:\n\n${msg}\n\nReply with "confirm" or "reject"`
+    }
+    const message = await conversation.send(wrappedMsg);
     console.log("Message sent", message);
     let sent;
     for await (const message of await xmtp.conversations.streamAllMessages()) {
