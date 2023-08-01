@@ -135,9 +135,20 @@ export class BookingsService {
     const startMeet = meetingDateTime.diff(beginningOfWeek, 'minutes').minutes / 60;
     const endMeet = startMeet + lengthMinutes / 60;
     if (times.some(([{ start, end }]) => start <= startMeet && end >= endMeet)) {
-      return `Hello, ${user.username}! You requested ${toUser.username}`;
+      // return `Hello, ${user.username}! You requested ${toUser.username}`;
     } else {
       throw new Error("Meeting time is not in schedule");
     }
+
+    const booking: CreateBookingDto = {
+      status: 'initial',
+      fromAddress: user.idAddress,
+      toUsername: toUser.username,
+      start: meetingDateTime.toISO(),
+      minutes: lengthMinutes,
+      msg: "Hi, I would like to meet with you.",
+    }
+    const createdBooking = await this.BookingModel.create(booking);
+    return `Hello, ${user.username}! You requested ${toUser.username}`;
   }
 }

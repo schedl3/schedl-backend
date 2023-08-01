@@ -1,4 +1,5 @@
 export class CreateBookingDto {
+  readonly status: string;
   readonly fromAddress: string;
   readonly toUsername: string;
   readonly start: Date;

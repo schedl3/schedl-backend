@@ -5,6 +5,13 @@ export type BookingDocument = HydratedDocument<Booking>;
 
 @Schema()
 export class Booking {
+  @Prop({
+    type: String,
+    enum: ['initial', 'confirmed', 'busy'],
+    default: 'initial'
+  })
+  status: string;
+
   @Prop()
   fromAddress: string;
 
