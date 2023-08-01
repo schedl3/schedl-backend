@@ -67,6 +67,11 @@ export class UsersService {
     if (!user) {
       throw new Error('User not found');
     }
+    if (!(user.username === undefined || user.username === '')) {
+      // prevent squatting
+      throw new Error('Username can only be set if it is currently empty.');
+    };
+
     user.username = username;
     await this.userModel.updateOne({ idAddress }, { username });
     return user;
