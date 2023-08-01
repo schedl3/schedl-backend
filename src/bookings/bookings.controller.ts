@@ -47,6 +47,18 @@ export class BookingsController {
     await this.bookingsService.create(createBookingDto);
   }
 
+  @Get('sent')
+  @UseGuards(CustomAuthGuard)
+  async fromMe(@Request() req): Promise<Booking[]> {
+    return this.bookingsService.findByFromAddress(req.user.idAddress);
+  }
+
+  @Get('recvd')
+  @UseGuards(CustomAuthGuard)
+  async toMe(@Request() req): Promise<Booking[]> {
+    return this.bookingsService.findByToUsername(req.user.username);
+  }
+
   @UseGuards(SuperUserGuard)
   @Get()
   async findAll(): Promise<Booking[]> {
@@ -57,6 +69,12 @@ export class BookingsController {
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<Booking> {
     return this.bookingsService.findOne(id);
+  }
+
+  // @UseGuards(SuperUserGuard)
+  @Get('from/:fromAddress')
+  async findByFromAddress(@Param('fromAddress') fromAddress: string): Promise<Booking[]> {
+    return this.bookingsService.findByFromAddress(fromAddress);
   }
 
   @UseGuards(SuperUserGuard)

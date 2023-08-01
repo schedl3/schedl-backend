@@ -96,6 +96,14 @@ export class BookingsService {
     return this.BookingModel.findOne({ _id: id }).exec();
   }
 
+  async findByFromAddress(fromAddress: string): Promise<Booking[]> {
+    return this.BookingModel.find({ fromAddress }).exec();
+  }
+
+  async findByToUsername(toUsername: string): Promise<Booking[]> {
+    return this.BookingModel.find({ toUsername }).exec();
+  }
+
   async delete(id: string) {
     const deletedBooking = await this.BookingModel
       .findByIdAndRemove({ _id: id })
