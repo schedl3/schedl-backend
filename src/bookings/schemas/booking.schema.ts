@@ -1,13 +1,16 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import * as sanitizeHtml from 'sanitize-html';
 
+
+console.log('typeof sanitizeHtml', typeof sanitizeHtml);
 export type BookingDocument = HydratedDocument<Booking>;
 
 @Schema()
 export class Booking {
   @Prop({
     type: String,
-    enum: ['initial', 'confirmed', 'busy'],
+    enum: ['initial', 'notified', 'confirmed', 'busy'],
     default: 'initial'
   })
   status: string;
@@ -24,7 +27,9 @@ export class Booking {
   @Prop()
   minutes: number;
 
-  @Prop()
+  @Prop({
+    set: (value: string) => sanitizeHtml(value),
+  })
   msg: string;
   
 }

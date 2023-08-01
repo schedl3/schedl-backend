@@ -146,7 +146,7 @@ export class BookingsService {
       toUsername: toUser.username,
       start: meetingDateTime.toISO(),
       minutes: lengthMinutes,
-      msg: "Hi, I would like to meet with you.",
+      msg: body.msg,
     }
     const createdBooking = await this.BookingModel.create(booking);
     return `Hello, ${user.username}! You requested ${toUser.username}`;
