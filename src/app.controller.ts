@@ -55,11 +55,16 @@ export class AppController {
     return this.authService.login(req.user);
   }
 
-
   @UseGuards(CustomAuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('profile/schedule')
+  getProfileSchedule(@Request() req) {
+    return this.usersService.findOne(req.user.idAddress);
   }
 
   @UseGuards(JwtAuthGuard)
