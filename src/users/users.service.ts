@@ -59,7 +59,7 @@ export class UsersService {
   ) {}
 
   async findOne(idAddress: string): Promise<User | undefined> {
-    return this.userModel.findOne({ idAddress });
+    return this.userModel.findOne({ idAddress }).select('-password');
   }
 
   async findOneUsername(username: string): Promise<User | undefined> {
