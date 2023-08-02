@@ -2,6 +2,7 @@
 import { Controller, Get, Request, Post, UseGuards, Param } from '@nestjs/common';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { AuthGuard } from '@nestjs/passport';
+import { CustomAuthGuard } from './auth/auth.guard';
 import { AuthService } from './auth/auth.service';
 import { BookingsService } from './bookings/bookings.service';
 import { XmtpService } from './xmtp/xmtp.service';
@@ -55,7 +56,7 @@ export class AppController {
   }
 
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(CustomAuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;
