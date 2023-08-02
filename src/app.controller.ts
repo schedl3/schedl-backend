@@ -26,7 +26,7 @@ export class AppController {
     const nonce = await new Promise((resolve, reject) => {
       store.challenge(req, (err, nonce) => {
         if (err) { reject(err); }
-        console.log('get challenge', err, nonce);
+        console.log('GET /challenge:', nonce);
         resolve(nonce);
       });
     });
