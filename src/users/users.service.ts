@@ -81,6 +81,17 @@ export class UsersService {
     return user;
   }
 
+  async setTwitterUsername(idAddress: string, twitterUsername: string): Promise<User> {
+    const user = await this.findOne(idAddress);
+    if (!user) {
+      throw new Error('User not found');
+    }
+ 
+    await this.userModel.updateOne({ idAddress }, { twitterUsername });
+    user.twitterUsername = twitterUsername;
+    return user;
+  }
+
   async setAssistantXmtpAddress(idAddress: string, assistantXmtpAddress: string): Promise<User> {
     const user = await this.findOne(idAddress);
     if (!user) {

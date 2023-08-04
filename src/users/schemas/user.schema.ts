@@ -44,6 +44,9 @@ export class User {
   ethereumAddress: string;
 
   @Prop()
+  twitterUsername: string;
+
+  @Prop()
   emailAddress: string;
 
   @Prop()

@@ -1,4 +1,4 @@
-import { Controller, Get, Req, Post, UseGuards, Param } from '@nestjs/common';
+import { Controller, Get, Req, Res, Post, Session, UseGuards, Param } from '@nestjs/common';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { CustomAuthGuard } from './auth/auth.guard';
@@ -6,7 +6,7 @@ import { AuthService } from './auth/auth.service';
 import { BookingsService } from './bookings/bookings.service';
 import { XmtpService } from './xmtp/xmtp.service';
 import { UsersService } from './users/users.service';
-import { User, UserDocument } from './users/schemas/user.schema';
+import { UserDocument } from './users/schemas/user.schema';
 import { SessionNonceStore } from 'passport-ethereum-siwe';
 
 @Controller()
@@ -54,6 +54,21 @@ export class AppController {
   @Post('auth/login')
   async login(@Req() req) {
     return this.authService.login(req.user);
+  }
+
+  @Get('auth/twitter')
+  @UseGuards(AuthGuard('twitter'))
+  twitterLogin() {
+    // XXX never reaches here
+    console.log('twitterLogin XXX never reaches here');
+    debugger;
+  }
+
+  // @Get('auth/twitter/callback') // TODO-example
+  @Get('oauth/callback/twitter')
+  @UseGuards(AuthGuard('twitter'))
+  twitterCallback(@Session() session: { views?: number }, @Req() req, @Res() res) {
+    res.redirect('https://localhost:3130/schedl-ui');
   }
 
   @UseGuards(CustomAuthGuard)
