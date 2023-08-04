@@ -38,28 +38,29 @@ export class User {
   idAddressIsPublic: boolean;
 
   @Prop()
+  assistantXmtpAddress: string;
+
+  @Prop()
   schedule: Schedule;
 
-  @Prop({ index: true })
-  ethereumAddress: string;
+  // @Prop({ index: true })
+  // ethereumAddress: string;
 
   @Prop()
   twitterUsername: string;
 
-  @Prop()
-  emailAddress: string;
+  // @Prop()
+  // emailAddress: string;
 
   @Prop()
-  description: string;
+  bio: string;
 
+  // admin only
   @Prop()
   password: string;
 
   @Prop()
   tz: string;
-
-  @Prop()
-  assistantXmtpAddress: string;
 
   @Prop({ default: Date.now })
   dateCreated: Date;

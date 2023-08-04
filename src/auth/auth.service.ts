@@ -10,6 +10,7 @@ export class AuthService {
     private jwtService: JwtService
   ) { }
 
+  // this is specific to local strategy
   async validateUser(username: string, pass: string): Promise<any> {
     const user = await this.usersService.findOneUsername(username);
     if (user && user.password === pass) {
@@ -19,17 +20,12 @@ export class AuthService {
     return null;
   }
 
-  async login(user: any) {
-    // const payload = { username: user.username, sub: user.userId };
-    const payload = { sub: user._doc.idAddress, idAddress: user._doc.idAddress, username: user._doc.username, assistantXmtpAddress: user._doc.assistantXmtpAddress, ethereumAddress: user._doc.ethereumAddress };
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
+  async login(user: UserDocument) {
+    return this.ethloginjwt(user);
   }
 
   async ethloginjwt(user: UserDocument) {
-    // return this.login(user);
-    const payload = { sub: user._id, idAddress: user.idAddress, username: user.username, assistantXmtpAddress: user.assistantXmtpAddress, ethereumAddress: user.ethereumAddress };
+    const payload = { sub: user._id, idAddress: user.idAddress, username: user.username, assistantXmtpAddress: user.assistantXmtpAddress };
     return {
       access_token: this.jwtService.sign(payload),
     };

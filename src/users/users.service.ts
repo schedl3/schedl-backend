@@ -86,7 +86,7 @@ export class UsersService {
     if (!user) {
       throw new Error('User not found');
     }
- 
+
     await this.userModel.updateOne({ idAddress }, { twitterUsername });
     user.twitterUsername = twitterUsername;
     return user;
@@ -126,16 +126,13 @@ export class UsersService {
   }
 
   async getProfileByUsername(username: string): Promise<Partial<User> | undefined> {
-    const user = await this.userModel.findOne({ username });
+    const user = await this.userModel.findOne({ username })
+      .select('-password -assistantXmtpAddress -dateCreated -idAddressIsPublic')
+      .exec();
     if (!user) {
       throw new Error('User not found');
     }
-    return {
-      username: user.username,
-      idAddress: user.idAddressIsPublic ? user.idAddress : undefined,
-      description: user.description,
-      schedule: user.schedule,
-    };
+    return user;
   }
 
   async create(user: Partial<UserDocument>): Promise<User> {
@@ -163,9 +160,7 @@ export class UsersService {
     const users = [
       {
         idAddress: '0x78a74b5D1A86704c573163C3aafB6e7234c9Da1e',
-        ethereumAddress: '0x78a74b5D1A86704c573163C3aafB6e7234c9Da1e',
-        emailAddress: 'user1@example.com',
-        description: 'SuperUser 1',
+        bio: 'SuperUser 1',
         password: 'password1',
         username: 'superuser',
         tz: 'America/New_York',
@@ -181,9 +176,7 @@ export class UsersService {
       },
       {
         idAddress: 'id2',
-        ethereumAddress: 'eth2',
-        emailAddress: 'user2@example.com',
-        description: 'User 2',
+        bio: 'User 2',
         password: 'password2',
         username: 'user2',
         tz: 'UTC',
