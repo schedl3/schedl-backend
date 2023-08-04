@@ -1,5 +1,4 @@
-
-import { Controller, Get, Request, Post, UseGuards, Param } from '@nestjs/common';
+import { Controller, Get, Req, Post, UseGuards, Param } from '@nestjs/common';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { CustomAuthGuard } from './auth/auth.guard';
@@ -7,8 +6,8 @@ import { AuthService } from './auth/auth.service';
 import { BookingsService } from './bookings/bookings.service';
 import { XmtpService } from './xmtp/xmtp.service';
 import { UsersService } from './users/users.service';
-import { Strategy as EthStrategy, SessionNonceStore } from 'passport-ethereum-siwe';
-import * as util from 'util';
+import { User, UserDocument } from './users/schemas/user.schema';
+import { SessionNonceStore } from 'passport-ethereum-siwe';
 
 @Controller()
 export class AppController {
@@ -16,11 +15,15 @@ export class AppController {
     private authService: AuthService,
     private bookingsService: BookingsService,
     private xmtpService: XmtpService,
-    private usersService: UsersService,  
+    private usersService: UsersService,
   ) { }
 
+  // The @Req() decorator is imported from the @nestjs/common, while Request from the express package.
+  // async getChallenge(@Request() req) { // @Request from '@nestjs/common': Extracts the `Request` object from the underlying platform and populates the decorated parameter with the value of `Request`.
+  // async getChallenge(@Req() req: Request ) { // Request from 'express'
+
   @Get('challenge')
-  async getChallenge(@Request() req) {
+  async getChallenge(@Req() req) {
     const store = new SessionNonceStore();
     console.log(req.session);
 
@@ -38,56 +41,54 @@ export class AppController {
   }
 
   @UseGuards(AuthGuard('ethereum'))
-  @Post('auth/ethlogin')
-  async ethlogin(@Request() req) {
-    return this.authService.ethlogin(req.user);
-  }
-
-  @UseGuards(AuthGuard('ethereum'))
   @Post('auth/ethloginjwt')
-  async ethloginjwt(@Request() req) {
-    return this.authService.ethloginjwt(req.user);
+  // async ethloginjwt(@Req() req: Request) { // .user of Request is different
+  async ethloginjwt(@Req() req) {
+    // TODO create a @User() decorator
+    const user: UserDocument = req.user;
+    req.session['idAddress'] = user.idAddress;
+    return this.authService.ethloginjwt(user);
   }
 
   @UseGuards(AuthGuard('local'))
   @Post('auth/login')
-  async login(@Request() req) {
+  async login(@Req() req) {
     return this.authService.login(req.user);
   }
 
   @UseGuards(CustomAuthGuard)
   @Get('profile')
-  getProfile(@Request() req) {
+  getProfile(@Req() req) {
     return req.user;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('profile/schedule')
-  getProfileSchedule(@Request() req) {
+  getProfileSchedule(@Req() req) {
     return this.usersService.findOne(req.user.idAddress);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('setUsername')
-  async setUsername(@Request() req) {
+  async setUsername(@Req() req) {
     return this.usersService.setUsername(req.user.idAddress, req.body.username);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('setAssistantXmtpAddress')
-  async setAssistantXmtpAddress(@Request() req) {
+  async setAssistantXmtpAddress(@Req() req) {
     return this.usersService.setAssistantXmtpAddress(req.user.idAddress, req.body.assistantXmtpAddress);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('updateSchedule')
-  async updateSchedule(@Request() req) {
+  async updateSchedule(@Req() req) {
     return this.usersService.updateSchedule(req.user.idAddress, req.body.schedule);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('toggleIdAddressIsPublic')
-  async toggleIdAddressIsPublic(@Request() req) {
+  async toggleIdAddressIsPublic(@Req() req) {
     const user = await this.usersService.findOne(req.user.idAddress);
     return this.usersService.setIdAddressIsPublic(req.user.idAddress, !user.idAddressIsPublic);
   }

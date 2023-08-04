@@ -1,6 +1,6 @@
 import { DateTime, Interval } from 'luxon';
 import { Injectable } from '@nestjs/common';
-import { InjectModel, getModelToken } from '@nestjs/mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { Booking, BookingDocument } from './schemas/booking.schema';
