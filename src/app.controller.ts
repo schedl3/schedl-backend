@@ -98,7 +98,7 @@ export class AppController {
   @UseGuards(JwtAuthGuard)
   @Post('setBio')
   async setBio(@Req() req) {
-    return this.usersService.setBio(req.user.idAddress, req.body.bi);
+    return this.usersService.setBio(req.user.idAddress, req.body.bio);
   }
 
   @UseGuards(JwtAuthGuard)
