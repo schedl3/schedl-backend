@@ -96,6 +96,18 @@ export class AppController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Post('setBio')
+  async setBio(@Req() req) {
+    return this.usersService.setBio(req.user.idAddress, req.body.bi);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('setTz')
+  async setTz(@Req() req) {
+    return this.usersService.setTz(req.user.idAddress, req.body.tz);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post('updateSchedule')
   async updateSchedule(@Req() req) {
     return this.usersService.updateSchedule(req.user.idAddress, req.body.schedule);

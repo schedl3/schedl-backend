@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as Joi from 'joi';
+import { IANAZone } from 'luxon';
 import { User, UserDocument, Schedule } from './schemas/user.schema';
 import { XmtpService } from '../xmtp/xmtp.service';
 
@@ -112,6 +113,30 @@ export class UsersService {
 
     user.assistantXmtpAddress = assistantXmtpAddress;
     // await this.userModel.updateOne({ idAddress }, { assistantXmtpAddress });
+    return user;
+  }
+
+  async setBio(idAddress: string, bio: string): Promise<User> {
+    const user = await this.findOne(idAddress);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    user.bio = bio;
+    await this.userModel.updateOne({ idAddress }, { bio });
+    return user;
+  }
+
+  async setTz(idAddress: string, tz: string): Promise<User> {
+    const user = await this.findOne(idAddress);
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+    if (!IANAZone.isValidZone(tz)) {
+      throw new Error('Invalid timezone provided');
+    }
+    user.tz = tz;
+    await this.userModel.updateOne({ idAddress }, { tz });
     return user;
   }
 
