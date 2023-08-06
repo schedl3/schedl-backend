@@ -2,8 +2,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import * as sanitizeHtml from 'sanitize-html';
 
-
-console.log('typeof sanitizeHtml', typeof sanitizeHtml);
 export type BookingDocument = HydratedDocument<Booking>;
 
 @Schema()
