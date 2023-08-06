@@ -9,7 +9,7 @@ import { User } from 'src/users/schemas/user.schema';
 import { XmtpService } from '../xmtp/xmtp.service';
 import { WalletsService } from '../wallets/wallets.service';
 import { HttpModule } from '@nestjs/axios'
-import { ScheduleCSVByDay, WeekHour, Partial24hTime, validateWeekHour, validateWeekHourRange, validatePartial24hTime, WeekHourRange, toWeekHour, toWeekHourRanges, getOffsetFromUTC, normalizeTzOffset } from './bookings.utils';
+import { ScheduleCSVByDay, WeekHour, Partial24hTime, validateWeekHour, validateWeekHourRange, validatePartial24hTime, WeekHourRange, toWeekHour, toWeekHourRanges, getOffsetFromUTC, normalizeTzOffset, tzToday, tzMonday, tzWeekHour } from './bookings.utils';
 
 const nowish = new Date();
 
@@ -115,6 +115,87 @@ describe('BookingsService', () => {
     expect(service).toBeDefined();
   });
 
+  it('should work when yesterday in NYC', () => {
+    const timeZone = 'America/New_York';
+    const utcIsoDateTime = '2023-08-10T01:23';
+
+    const today = tzToday(timeZone, utcIsoDateTime);
+
+    expect(today.toISO()).toBe('2023-08-09T00:00:00.000-04:00');
+  });
+
+  it('should work when tomorrow in Tokyo', () => {
+    const timeZone = 'Asia/Tokyo';
+    const utcIsoDateTime = '2023-08-10T22:22';
+
+    const today = tzToday(timeZone, utcIsoDateTime);
+
+    expect(today.toISO()).toBe('2023-08-11T00:00:00.000+09:00');
+  });
+
+  it('should work when yesterday Sunday in NYC', () => {
+    const timeZone = 'America/New_York';
+    const utcIsoDateTime = '2023-08-07T01:23';
+
+    const mondayOfWeek = tzMonday(timeZone, utcIsoDateTime);
+
+    expect(mondayOfWeek.toISO()).toBe('2023-07-31T00:00:00.000-04:00');
+  });
+
+  it('should work when already Monday in VN', () => {
+    const timeZone = 'Asia/Bangkok';
+    const utcIsoDateTime = '2023-08-06T17:18';
+
+    const mondayOfWeek = tzMonday(timeZone, utcIsoDateTime);
+
+    expect(mondayOfWeek.toISO()).toBe('2023-08-07T00:00:00.000+07:00');
+  });
+
+  it('should return 1 when 1am Monday in UTC', () => {
+    const timeZone = 'UTC';
+    const utcIsoDateTime = '2023-08-07T01:00';
+
+    const wh = tzWeekHour(timeZone, utcIsoDateTime);
+
+    expect(wh).toBe(1);
+  });
+
+  it('should return 1 when 6pm Sunday GMT = 1am Mon Vietnam', () => {
+    const timeZone = 'Asia/Bangkok';
+    const utcIsoDateTime = '2023-08-06T18:00';
+
+    const wh = tzWeekHour(timeZone, utcIsoDateTime);
+
+    expect(wh).toBe(1);
+  });
+
+  it('should return 25 when 6pm Monday GMT = 1am Tue Vietnam', () => {
+    const timeZone = 'Asia/Bangkok';
+    const utcIsoDateTime = '2023-08-07T18:00';
+
+    const wh = tzWeekHour(timeZone, utcIsoDateTime);
+
+    expect(wh).toBe(25);
+  });
+
+  it('should return 25 when 6pm Monday GMT = 1am Tue Vietnam', () => {
+    const timeZone = 'Asia/Bangkok';
+    const utcIsoDateTime = '2023-08-07T18:00';
+
+    const wh = tzWeekHour(timeZone, utcIsoDateTime);
+
+    expect(wh).toBe(25);
+  });
+
+  it('should return 167 when it is 11:00 p.m. in Detroit', () => {
+    const timeZone = 'America/Detroit';
+    const utcIsoDateTime = '2023-08-07T03:00:00.000Z';
+
+    const wh = tzWeekHour(timeZone, utcIsoDateTime);
+
+    expect(wh).toBe(167);
+  });
+  
   it('should return the input value when it is within the valid range (0 to 168)', () => {
     expect(validateWeekHour(0)).toBe(0 as WeekHour);
     expect(validateWeekHour(100)).toBe(100 as WeekHour);

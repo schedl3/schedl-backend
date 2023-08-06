@@ -79,8 +79,8 @@ export function toWeekHourRanges(schedule: ScheduleCSVByDay) {
   return [].concat(...Object.values(rangesByDay));
 }
 
-// returns hours not minutes
-export function getOffsetFromUTC(tz) {
+// returns hours not minutes, Detroit = -4
+export function getOffsetFromUTC(tz: string) {
   const dt = DateTime.utc().setZone(tz);
   return dt.offset / 60;
 }
@@ -103,4 +103,28 @@ export function normalizeTzOffset(ranges: Array<WeekHourRange>, offset: number) 
     }
     return [validateWeekHourRange({ start, end })];
   });
+}
+
+export function tzToday(tz: string, utcIsoDateTime?: string): DateTime {
+  const utcDateTime = utcIsoDateTime ? DateTime.fromISO(utcIsoDateTime, { zone: 'utc' }) : DateTime.utc();
+  const today = utcDateTime.setZone(tz).startOf('day');
+  // console.log('today:', today.toISO());
+
+  return today;
+}
+
+export function tzMonday(tz: string, utcIsoDateTime?: string): DateTime {
+  const utcDateTime = utcIsoDateTime ? DateTime.fromISO(utcIsoDateTime, { zone: 'utc' }) : DateTime.utc();
+  const mondayOfWeek = utcDateTime.setZone(tz).startOf('week');
+
+  return mondayOfWeek;
+}
+
+export function tzWeekHour(tz: string, utcIsoDateTime?: string): DateTime {
+  const utcDateTime = utcIsoDateTime ? DateTime.fromISO(utcIsoDateTime, { zone: 'utc' }) : DateTime.utc();
+  const mondayOfWeek = utcDateTime.setZone(tz).startOf('week');
+  const hour = utcDateTime.setZone(tz).startOf('hour');
+  const wh = validateWeekHour(Interval.fromDateTimes(mondayOfWeek, hour).length('hours'));
+
+  return wh;
 }
