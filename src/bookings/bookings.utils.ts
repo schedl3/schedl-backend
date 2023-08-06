@@ -86,7 +86,7 @@ export function getOffsetFromUTC(tz: string) {
 }
 
 // convert from non-utc to utc to all the available hour ranges during a 168 hour week
-export function normalizeTzOffset(ranges: Array<WeekHourRange>, offset: number) {
+export function offsetScheduleRanges(ranges: Array<WeekHourRange>, offset: number) {
   const hoursInWeek = 24 * 7;
   return ranges.map(({ start, end }: WeekHourRange) => ({
     start: start - offset,

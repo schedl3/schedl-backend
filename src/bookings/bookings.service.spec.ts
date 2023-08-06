@@ -9,7 +9,7 @@ import { User } from 'src/users/schemas/user.schema';
 import { XmtpService } from '../xmtp/xmtp.service';
 import { WalletsService } from '../wallets/wallets.service';
 import { HttpModule } from '@nestjs/axios'
-import { ScheduleCSVByDay, WeekHour, Partial24hTime, validateWeekHour, validateWeekHourRange, validatePartial24hTime, WeekHourRange, toWeekHour, toWeekHourRanges, getOffsetFromUTC, normalizeTzOffset, tzToday, tzMonday, tzWeekHour } from './bookings.utils';
+import { ScheduleCSVByDay, WeekHour, Partial24hTime, validateWeekHour, validateWeekHourRange, validatePartial24hTime, WeekHourRange, toWeekHour, toWeekHourRanges, getOffsetFromUTC, offsetScheduleRanges, tzToday, tzMonday, tzWeekHour } from './bookings.utils';
 
 const nowish = new Date();
 
@@ -195,7 +195,7 @@ describe('BookingsService', () => {
 
     expect(wh).toBe(167);
   });
-  
+
   it('should return the input value when it is within the valid range (0 to 168)', () => {
     expect(validateWeekHour(0)).toBe(0 as WeekHour);
     expect(validateWeekHour(100)).toBe(100 as WeekHour);
@@ -249,8 +249,8 @@ describe('BookingsService', () => {
       Tue: "9:00-17:00",
       Wed: "11:00-14:00,15:30-20:00",
       Thu: "8:00-13:00",
-      Fri: "", // Empty for Friday
-      Sat: "8:30-12:30", // Additional time range for Saturday
+      Fri: "",
+      Sat: "8:30-12:30",
     };
 
     const result = toWeekHourRanges(schedule);
@@ -309,28 +309,61 @@ describe('BookingsService', () => {
 
     const expectedResults = [
       [
-        { start: 22, end: 42 }, 
+        { start: 22, end: 42 },
       ],
       [
-        { start: 18, end: 38 }, 
+        { start: 18, end: 38 },
       ],
       [
         { start: 10, end: 30 },
       ],
       [
-        { start: 5, end: 25 }, 
+        { start: 5, end: 25 },
       ],
       [
-        { start: 0, end: 20 }, 
+        { start: 0, end: 20 },
       ],
     ];
 
     // Test with each offset and verify the results
     offsetsToTest.forEach((offset, index) => {
-      const result = normalizeTzOffset(sparseSchedule, offset);
+      const result = offsetScheduleRanges(sparseSchedule, offset);
       const expectedResult = expectedResults[index].map(validateWeekHourRange);
       expect(result).toEqual(expectedResult);
     });
+  });
+
+  it('should return the correct VN schedule offset to India', () => {
+    const schedule: ScheduleCSVByDay = {
+      Sun: "23:00-23:30",
+      Mon: "1:30-2,10:00-16:00",
+      Tue: "00-1",
+      Wed: "",
+      Thu: "",
+      Fri: "",
+      Sat: "",
+    };
+    // [
+    //   { start: 167, end: 167.5 },
+    //   { start: 1.5, end: 2 },
+    //   { start: 10, end: 16 },
+    //   { start: 24, end: 25 }
+    // ]
+
+    const offsetIST = getOffsetFromUTC('Asia/Kolkata');
+    const offsetICT = getOffsetFromUTC('Asia/Bangkok');
+    const offset = offsetICT - offsetIST;
+    // console.log(offset);
+    // console.log(toWeekHourRanges(schedule));
+    const indianTimes = offsetScheduleRanges(toWeekHourRanges(schedule), offset);
+    // console.log(indianTimes);
+    const expected = [
+      { start: 165.5, end: 166 },
+      { start: 0, end: 0.5 },
+      { start: 8.5, end: 14.5 },
+      { start: 22.5, end: 23.5 }
+    ];
+    expect(indianTimes).toEqual(expected);
   });
 
   it('should return all bookings', async () => {

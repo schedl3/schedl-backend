@@ -6,7 +6,7 @@ import { CreateBookingDto } from './dto/create-booking.dto';
 import { Booking } from './schemas/booking.schema';
 import { UsersService } from '../users/users.service';
 import { XmtpService } from '../xmtp/xmtp.service';
-import { toWeekHourRanges, getOffsetFromUTC, normalizeTzOffset} from './bookings.utils'
+import { toWeekHourRanges, getOffsetFromUTC, offsetScheduleRanges} from './bookings.utils'
 
 @Injectable()
 export class BookingsService {
@@ -66,7 +66,7 @@ export class BookingsService {
     console.log('orig:', times);
     const tz = toUser.tz ? toUser.tz : 'utc';
     const off = getOffsetFromUTC(tz);
-    times = normalizeTzOffset(times, off);
+    times = offsetScheduleRanges(times, off);
     console.log('norm:', times);
     // Calculate the start time and end time of the meeting in the week
     const beginningOfWeek = meetingDateTime.startOf('week');
