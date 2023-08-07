@@ -9,7 +9,24 @@ import { User } from 'src/users/schemas/user.schema';
 import { XmtpService } from '../xmtp/xmtp.service';
 import { WalletsService } from '../wallets/wallets.service';
 import { HttpModule } from '@nestjs/axios'
-import { ScheduleCSVByDay, WeekHour, Partial24hTime, validateWeekHour, validateWeekHourRange, validatePartial24hTime, WeekHourRange, toWeekHour, toWeekHourRanges, getOffsetFromUTC, offsetScheduleRanges, tzToday, tzMonday, tzWeekHour } from './bookings.utils';
+import {
+  ScheduleCSVByDay,
+  WeekHour,
+  Partial24hTime,
+  validateWeekHour,
+  validateWeekHourRange,
+  validatePartial24hTime,
+  WeekHourRange,
+  toWeekHour,
+  toWeekHourRanges,
+  getOffsetFromUTC,
+  transformScheduleRangesFromTz,
+  tzToday,
+  tzMonday,
+  tzWeekHour,
+  tzHourInfo,
+  availability,
+} from './bookings.utils';
 
 const nowish = new Date();
 
@@ -153,20 +170,24 @@ describe('BookingsService', () => {
 
   it('should return 1 when 1am Monday in UTC', () => {
     const timeZone = 'UTC';
-    const utcIsoDateTime = '2023-08-07T01:00';
+    const utcIsoDateTime = '2023-08-07T01:01';
 
     const wh = tzWeekHour(timeZone, utcIsoDateTime);
 
     expect(wh).toBe(1);
+
+    expect(tzHourInfo(timeZone, utcIsoDateTime)).toEqual({ date: '2023-08-07', times: ['01:00'] })
   });
 
   it('should return 1 when 6pm Sunday GMT = 1am Mon Vietnam', () => {
     const timeZone = 'Asia/Bangkok';
-    const utcIsoDateTime = '2023-08-06T18:00';
+    const utcIsoDateTime = '2023-08-06T18:59';
 
     const wh = tzWeekHour(timeZone, utcIsoDateTime);
 
     expect(wh).toBe(1);
+
+    expect(tzHourInfo(timeZone, utcIsoDateTime)).toEqual({ date: '2023-08-07', times: ['01:00'] })
   });
 
   it('should return 25 when 6pm Monday GMT = 1am Tue Vietnam', () => {
@@ -176,6 +197,8 @@ describe('BookingsService', () => {
     const wh = tzWeekHour(timeZone, utcIsoDateTime);
 
     expect(wh).toBe(25);
+
+    expect(tzHourInfo(timeZone, utcIsoDateTime)).toEqual({ date: '2023-08-08', times: ['01:00'] })
   });
 
   it('should return 25 when 6pm Monday GMT = 1am Tue Vietnam', () => {
@@ -194,6 +217,82 @@ describe('BookingsService', () => {
     const wh = tzWeekHour(timeZone, utcIsoDateTime);
 
     expect(wh).toBe(167);
+  });
+
+  it('should return the correct UTC availability from week start', () => {
+    const schedule: ScheduleCSVByDay = {
+      Sun: "23:00-23:30",
+      Mon: "1:30-2,10:00-16:00",
+      Tue: "00-1",
+      Wed: "",
+      Thu: "",
+      Fri: "",
+      Sat: "",
+    };
+
+    const utcTimes = transformScheduleRangesFromTz(toWeekHourRanges(schedule), 'utc');
+    // console.log(utcTimes);
+    const timeZone = 'UTC';
+    const utcIsoDateTime = '2023-08-07T01:00';
+    const res = availability(utcTimes, timeZone, utcIsoDateTime);
+    const expected = {
+      '2023-08-13': [ [ '23:00', '23:30' ] ],
+      '2023-08-07': [ [ '01:30', '02:00' ], [ '10:00', '16:00' ] ],
+      '2023-08-08': [ [ '00:00', '01:00' ] ]
+    }
+    expect(res).toEqual(expected);
+  });
+
+  it('should return the correct VN schedule for UTC availability from week start', () => {
+    const schedule: ScheduleCSVByDay = {
+      Sun: "23:00-23:30",
+      Mon: "1:30-2,10:00-16:00",
+      Tue: "00-1",
+      Wed: "",
+      Thu: "",
+      Fri: "",
+      Sat: "",
+    };
+
+    const scheduleTz = 'Asia/Bangkok';
+    const utcTimes = transformScheduleRangesFromTz(toWeekHourRanges(schedule), scheduleTz);
+    // console.log(utcTimes);
+    // [
+    //   { start: 160, end: 160.5 },
+    //   { start: 162.5, end: 163 },
+    //   { start: 3, end: 9 },
+    //   { start: 17, end: 18 }
+    // ]
+
+    const utcIsoDateTime = '2023-08-07T01:00';
+    const viewTz = 'utc'
+    const res = availability(utcTimes, viewTz, utcIsoDateTime);
+    const expected = {
+      '2023-08-13': [ [ '16:00', '16:30' ], [ '18:30', '19:00' ] ],
+      '2023-08-07': [ [ '03:00', '09:00' ], [ '17:00', '18:00' ] ]
+    }
+    expect(res).toEqual(expected);
+  });
+
+  it('should return the correct UTC availability from weekend', () => {
+    const schedule: ScheduleCSVByDay = {
+      Sun: "23:00-23:30",
+      Mon: "1:30-2,10:00-16:00",
+      Tue: "00-1",
+      Wed: "",
+      Thu: "",
+      Fri: "",
+      Sat: "",
+    };
+
+    const utcTimes = transformScheduleRangesFromTz(toWeekHourRanges(schedule), 'utc');
+    // console.log(utcTimes);
+    const timeZone = 'UTC';
+    const utcIsoDateTime = '2023-08-12T01:00';
+    const res = availability(utcTimes, timeZone, utcIsoDateTime);
+    const expected = { '2023-08-13': [ [ '23:00', '23:30' ] ] }
+    expect(res).toEqual(expected);
+    
   });
 
   it('should return the input value when it is within the valid range (0 to 168)', () => {
@@ -305,12 +404,10 @@ describe('BookingsService', () => {
       validateWeekHourRange({ start: 10, end: 30 }), // Monday: 10:00 AM to 6:00 AM (next day)
     ];
 
-    const offsetsToTest: number[] = [-12, -8, 0, 5, 10]; // Test with different offsets
+    const offsetsToTest: number[] = [-8, 0, 5, 10]; // Test with different offsets
+    const tzs = ['America/Anchorage', 'UTC', 'Asia/Karachi', 'Australia/Sydney']
 
     const expectedResults = [
-      [
-        { start: 22, end: 42 },
-      ],
       [
         { start: 18, end: 38 },
       ],
@@ -326,8 +423,8 @@ describe('BookingsService', () => {
     ];
 
     // Test with each offset and verify the results
-    offsetsToTest.forEach((offset, index) => {
-      const result = offsetScheduleRanges(sparseSchedule, offset);
+    tzs.forEach((tz, index) => {
+      const result = transformScheduleRangesFromTz(sparseSchedule, tz);
       const expectedResult = expectedResults[index].map(validateWeekHourRange);
       expect(result).toEqual(expectedResult);
     });
@@ -350,12 +447,12 @@ describe('BookingsService', () => {
     //   { start: 24, end: 25 }
     // ]
 
-    const offsetIST = getOffsetFromUTC('Asia/Kolkata');
-    const offsetICT = getOffsetFromUTC('Asia/Bangkok');
-    const offset = offsetICT - offsetIST;
+    // const offsetIST = getOffsetFromUTC('Asia/Kolkata');
+    // const offsetICT = getOffsetFromUTC('Asia/Bangkok');
+    // const offset = offsetICT - offsetIST;
     // console.log(offset);
     // console.log(toWeekHourRanges(schedule));
-    const indianTimes = offsetScheduleRanges(toWeekHourRanges(schedule), offset);
+    const indianTimes = transformScheduleRangesFromTz(toWeekHourRanges(schedule), 'Asia/Bangkok', 'Asia/Kolkata');
     // console.log(indianTimes);
     const expected = [
       { start: 165.5, end: 166 },
@@ -364,6 +461,33 @@ describe('BookingsService', () => {
       { start: 22.5, end: 23.5 }
     ];
     expect(indianTimes).toEqual(expected);
+  });
+
+  it('should return the correct VN schedule offset to UTC', () => {
+    const schedule: ScheduleCSVByDay = {
+      Sun: "",
+      Mon: "1:30-2,10:00-16:00",
+      Tue: "00-1",
+      Wed: "",
+      Thu: "",
+      Fri: "",
+      Sat: "",
+    };
+    // [
+    //   { start: 1.5, end: 2 },
+    //   { start: 10, end: 16 },
+    //   { start: 24, end: 25 }
+    // ]
+
+    // console.log(toWeekHourRanges(schedule));
+    const utcTimes = transformScheduleRangesFromTz(toWeekHourRanges(schedule), 'Asia/Bangkok');
+    // console.log(utcTimes);
+    const expected = [
+      { start: 162.5, end: 163 },
+      { start: 3, end: 9 },
+      { start: 17, end: 18 }
+    ];
+    expect(utcTimes).toEqual(expected);
   });
 
   it('should return all bookings', async () => {
