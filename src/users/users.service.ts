@@ -165,7 +165,7 @@ export class UsersService {
     return newUser.save();
   }
 
-  async updateSchedule(idAddress: string, schedule: Schedule): Promise<User> {
+  async setSchedule(idAddress: string, schedule: Schedule): Promise<User> {
     const user = await this.findOne(idAddress);
     if (!user) {
       throw new Error('User not found');

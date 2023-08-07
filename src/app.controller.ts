@@ -108,9 +108,9 @@ export class AppController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('updateSchedule')
-  async updateSchedule(@Req() req) {
-    return this.usersService.updateSchedule(req.user.idAddress, req.body.schedule);
+  @Post('setSchedule')
+  async setSchedule(@Req() req) {
+    return this.usersService.setSchedule(req.user.idAddress, req.body.schedule);
   }
 
   @UseGuards(JwtAuthGuard)
