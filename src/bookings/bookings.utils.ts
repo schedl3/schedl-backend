@@ -86,7 +86,8 @@ export function getOffsetFromUTC(tz: string) {
 }
 
 // convert from non-utc to utc to all the available hour ranges during a 168 hour week
-export function offsetScheduleRanges(ranges: Array<WeekHourRange>, offset: number) {
+export function transformScheduleRangesFromTz(ranges: Array<WeekHourRange>, fromTz: string, toTz: string = 'UTC') {
+  const offset = getOffsetFromUTC(fromTz) - getOffsetFromUTC(toTz);
   const hoursInWeek = 24 * 7;
   return ranges.map(({ start, end }: WeekHourRange) => ({
     start: start - offset,
@@ -120,11 +121,45 @@ export function tzMonday(tz: string, utcIsoDateTime?: string): DateTime {
   return mondayOfWeek;
 }
 
-export function tzWeekHour(tz: string, utcIsoDateTime?: string): DateTime {
+export function tzWeekHour(tz: string, utcIsoDateTime?: string): WeekHour {
   const utcDateTime = utcIsoDateTime ? DateTime.fromISO(utcIsoDateTime, { zone: 'utc' }) : DateTime.utc();
-  const mondayOfWeek = utcDateTime.setZone(tz).startOf('week');
   const hour = utcDateTime.setZone(tz).startOf('hour');
+  const mondayOfWeek = tzMonday(tz, utcIsoDateTime);
+
   const wh = validateWeekHour(Interval.fromDateTimes(mondayOfWeek, hour).length('hours'));
 
   return wh;
+}
+
+export function tzHourInfo(tz: string, utcIsoDateTime?: string): { date: string; times: string[] } {
+  const mondayOfWeek = tzMonday(tz, utcIsoDateTime);
+  const wh = tzWeekHour(tz, utcIsoDateTime);
+  const hourTime = mondayOfWeek.plus({ hours: wh });
+  const dateWithoutTime = hourTime.toFormat('yyyy-MM-dd');
+  const hour = hourTime.toFormat('HH:mm');
+
+  return { date: dateWithoutTime, times: [hour] };
+}
+
+export function availability(ranges: Array<WeekHourRange>, tz: string, utcIsoDateTime?: string): Record<string, Array<string[2][]>> {
+  const result: Record<string, Array<string[2]>[]> = {};
+  const utcDateTime = utcIsoDateTime ? DateTime.fromISO(utcIsoDateTime, { zone: 'utc' }) : DateTime.utc();
+  const mondayOfWeek = tzMonday(tz, utcIsoDateTime);
+  const wh = tzWeekHour(tz, utcIsoDateTime);
+
+  ranges.forEach(({ start, end }: WeekHourRange) => {
+    if (start > wh) {
+      const tStart = mondayOfWeek.plus({ hours: start });
+      const tEnd = mondayOfWeek.plus({ hours: end });
+      const dateWithoutTime = tStart.toFormat('yyyy-MM-dd');
+      if (result[dateWithoutTime] === undefined) {
+        result[dateWithoutTime] = [];
+      }
+      result[dateWithoutTime].push([tStart.toFormat('HH:mm'), tEnd.toFormat('HH:mm')]);
+    }
+  });
+
+  // console.log('availability:', result);
+  return result;
+
 }
