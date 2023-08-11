@@ -6,7 +6,7 @@ import { CreateBookingDto } from './dto/create-booking.dto';
 import { Booking } from './schemas/booking.schema';
 import { UsersService } from '../users/users.service';
 import { XmtpService } from '../xmtp/xmtp.service';
-import { toWeekHourRanges, getOffsetFromUTC, transformScheduleRangesFromTz} from './bookings.utils'
+import { toWeekHourRanges, getOffsetFromUTC, transformScheduleRangesFromTz, availability} from './bookings.utils'
 
 @Injectable()
 export class BookingsService {
@@ -41,6 +41,16 @@ export class BookingsService {
       .findByIdAndRemove({ _id: id })
       .exec();
     return deletedBooking;
+  }
+
+  async availabilityByUsername(username: string, tz: string): Promise<Record<string, Array<string[2][]>>> {
+    const user = await this.usersService.getProfileByUsername(username);
+    console.log(user);
+    if (!user) {
+      throw new Error("User does not exist");
+    }
+    const ranges = transformScheduleRangesFromTz(toWeekHourRanges(user.schedule), user.tz, tz);
+    return availability(ranges, tz);
   }
 
   async makeRequest(fromUser: any, requestBody: any): Promise<string> {

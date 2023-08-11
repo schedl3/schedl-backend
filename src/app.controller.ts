@@ -73,12 +73,17 @@ export class AppController {
 
   @UseGuards(JwtAuthGuard)
   @Get('users/me')
-  getProfileSchedule(@Req() req) {
+  usersMe(@Req() req) {
     return this.usersService.findOne(req.user.idAddress);
   }
 
+  @Get('users/availability')
+  async usersAvailability(@Query('username') username: string, @Query('tz') tz: string) {
+    return this.bookingsService.availabilityByUsername(username, tz);
+  }
+
   @Get('users')
-  async getProfileByUsername(@Query('username') username: string) {
+  async usersUsername(@Query('username') username: string) {
     return this.usersService.getProfileByUsername(username);
   }
 
