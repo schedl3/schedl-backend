@@ -7,7 +7,7 @@ export type WeekHour = number & { __weekHoursBrand: never };
 export type Partial24hTime = string & { __partial24hTimeBrand: never };
 
 export const validateWeekHour = (value: number): WeekHour => {
-  if (value < 0 || value > 24*7) {
+  if (value < 0 || value > 24 * 7) {
     throw new Error('WeekHour must be between 0 and 168.');
   }
   return value as WeekHour;
@@ -35,7 +35,7 @@ export interface WeekHourRange {
   end: WeekHour;
 }
 
-export const validateWeekHourRange = ({start, end}) => {
+export const validateWeekHourRange = ({ start, end }) => {
   validateWeekHour(start);
   validateWeekHour(end);
   return { start, end } as WeekHourRange;
@@ -141,25 +141,40 @@ export function tzHourInfo(tz: string, utcIsoDateTime?: string): { date: string;
   return { date: dateWithoutTime, times: [hour] };
 }
 
+// ranges is pre-transformed from owner's time zone
 export function availability(ranges: Array<WeekHourRange>, tz: string, utcIsoDateTime?: string): Record<string, Array<string[2][]>> {
   const result: Record<string, Array<string[2]>[]> = {};
-  const utcDateTime = utcIsoDateTime ? DateTime.fromISO(utcIsoDateTime, { zone: 'utc' }) : DateTime.utc();
   const mondayOfWeek = tzMonday(tz, utcIsoDateTime);
   const wh = tzWeekHour(tz, utcIsoDateTime);
 
   ranges.forEach(({ start, end }: WeekHourRange) => {
+    let beNextWeek = 0;
     if (start > wh) {
-      const tStart = mondayOfWeek.plus({ hours: start });
-      const tEnd = mondayOfWeek.plus({ hours: end });
-      const dateWithoutTime = tStart.toFormat('yyyy-MM-dd');
-      if (result[dateWithoutTime] === undefined) {
-        result[dateWithoutTime] = [];
-      }
-      result[dateWithoutTime].push([tStart.toFormat('HH:mm'), tEnd.toFormat('HH:mm')]);
+      beNextWeek = 0;
+    } else {
+      beNextWeek = 7 * 24;
     }
+    const tStart = mondayOfWeek.plus({ hours: start + beNextWeek });
+    const tEnd = mondayOfWeek.plus({ hours: end + beNextWeek });
+    const dateWithoutTime = tStart.toFormat('yyyy-MM-dd');
+    if (result[dateWithoutTime] === undefined) {
+      result[dateWithoutTime] = [];
+    }
+    result[dateWithoutTime].push([tStart.toFormat('HH:mm'), tEnd.toFormat('HH:mm')]);
   });
 
   // console.log('availability:', result);
-  return result;
+  return orderObjectKeys(result);
 
+}
+
+function orderObjectKeys<T extends Record<string, any>>(obj: T): T {
+  const orderedKeys = Object.keys(obj).sort();
+
+  const orderedObject = orderedKeys.reduce((ordered, key) => {
+    ordered[key as keyof T] = obj[key as keyof T];
+    return ordered;
+  }, {} as T);
+
+  return orderedObject;
 }

@@ -236,9 +236,9 @@ describe('BookingsService', () => {
     const utcIsoDateTime = '2023-08-07T01:00';
     const res = availability(utcTimes, timeZone, utcIsoDateTime);
     const expected = {
-      '2023-08-13': [ [ '23:00', '23:30' ] ],
-      '2023-08-07': [ [ '01:30', '02:00' ], [ '10:00', '16:00' ] ],
-      '2023-08-08': [ [ '00:00', '01:00' ] ]
+      '2023-08-13': [['23:00', '23:30']],
+      '2023-08-07': [['01:30', '02:00'], ['10:00', '16:00']],
+      '2023-08-08': [['00:00', '01:00']]
     }
     expect(res).toEqual(expected);
   });
@@ -268,8 +268,8 @@ describe('BookingsService', () => {
     const viewTz = 'utc'
     const res = availability(utcTimes, viewTz, utcIsoDateTime);
     const expected = {
-      '2023-08-13': [ [ '16:00', '16:30' ], [ '18:30', '19:00' ] ],
-      '2023-08-07': [ [ '03:00', '09:00' ], [ '17:00', '18:00' ] ]
+      '2023-08-13': [['16:00', '16:30'], ['18:30', '19:00']],
+      '2023-08-07': [['03:00', '09:00'], ['17:00', '18:00']]
     }
     expect(res).toEqual(expected);
   });
@@ -290,9 +290,14 @@ describe('BookingsService', () => {
     const timeZone = 'UTC';
     const utcIsoDateTime = '2023-08-12T01:00';
     const res = availability(utcTimes, timeZone, utcIsoDateTime);
-    const expected = { '2023-08-13': [ [ '23:00', '23:30' ] ] }
+    const expected = {
+      '2023-08-13': [['23:00', '23:30']],
+      '2023-08-14': [['01:30', '02:00'], ['10:00', '16:00']],
+      '2023-08-15': [['00:00', '01:00']]
+    };
+
     expect(res).toEqual(expected);
-    
+
   });
 
   it('should return the input value when it is within the valid range (0 to 168)', () => {
