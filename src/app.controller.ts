@@ -1,4 +1,4 @@
-import { Controller, Get, Req, Res, Post, Session, UseGuards, Param } from '@nestjs/common';
+import { Controller, Get, Patch, Req, Res, Post, Session, UseGuards, Query, BadRequestException, Param } from '@nestjs/common';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { CustomAuthGuard } from './auth/auth.guard';
@@ -71,57 +71,36 @@ export class AppController {
     res.redirect('https://localhost:3130/schedl-ui');
   }
 
-  @UseGuards(CustomAuthGuard)
-  @Get('profile')
-  getProfile(@Req() req) {
-    return req.user;
-  }
-
   @UseGuards(JwtAuthGuard)
-  @Get('profile/schedule')
+  @Get('users/me')
   getProfileSchedule(@Req() req) {
     return this.usersService.findOne(req.user.idAddress);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Post('setUsername')
-  async setUsername(@Req() req) {
-    return this.usersService.setUsername(req.user.idAddress, req.body.username);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post('setAssistantXmtpAddress')
-  async setAssistantXmtpAddress(@Req() req) {
-    return this.usersService.setAssistantXmtpAddress(req.user.idAddress, req.body.assistantXmtpAddress);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post('setBio')
-  async setBio(@Req() req) {
-    return this.usersService.setBio(req.user.idAddress, req.body.bio);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post('setTz')
-  async setTz(@Req() req) {
-    return this.usersService.setTz(req.user.idAddress, req.body.tz);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post('setSchedule')
-  async setSchedule(@Req() req) {
-    return this.usersService.setSchedule(req.user.idAddress, req.body.schedule);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post('toggleIdAddressIsPublic')
-  async toggleIdAddressIsPublic(@Req() req) {
-    const user = await this.usersService.findOne(req.user.idAddress);
-    return this.usersService.setIdAddressIsPublic(req.user.idAddress, !user.idAddressIsPublic);
-  }
-
-  @Get('profile/:username')
-  async getProfileByUsername(@Param('username') username: string) {
+  @Get('users')
+  async getProfileByUsername(@Query('username') username: string) {
     return this.usersService.getProfileByUsername(username);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('users/me/:property')
+  async updateProfileProperty(@Req() req, @Param('property') property: string) {
+    switch (property) {
+      case 'username':
+        return this.usersService.setUsername(req.user.idAddress, req.body[property]);
+      case 'idAddressIsPublic':
+        return this.usersService.setIdAddressIsPublic(req.user.idAddress, req.body[property]);
+      case 'assistantXmtpAddress':
+        return this.usersService.setAssistantXmtpAddress(req.user.idAddress, req.body[property]);
+      case 'bio':
+        return this.usersService.setBio(req.user.idAddress, req.body[property]);
+      case 'tz':
+        return this.usersService.setTz(req.user.idAddress, req.body[property]);
+      case 'schedule':
+        return this.usersService.setSchedule(req.user.idAddress, req.body[property]);
+      default:
+        throw new BadRequestException('Invalid property');
+    }
+  }
+
 }
