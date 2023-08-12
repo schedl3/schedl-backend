@@ -41,22 +41,27 @@ export class BookingsController {
     private readonly xmtpService: XmtpService,
   ) { }
 
+  @Post('me')
+  @UseGuards(CustomAuthGuard)
+  async makeRequest(@Request() req) {
+    return this.bookingsService.makeRequest(req.user, req.body);
+  }
+
+  @Get('me/:toOrFrom?')
+  @UseGuards(CustomAuthGuard)
+  async fromMe(@Param('toOrFrom') toOrFrom: string, @Request() req): Promise<Booking[]> {
+    if (toOrFrom === 'to') {
+      return this.bookingsService.findMine(null, req.user.username);
+    } else if (toOrFrom === 'from') {
+      return this.bookingsService.findMine(req.user.idAddress, null);
+    }
+    return this.bookingsService.findMine(req.user.idAddress, req.user.username);
+  }
+
   @UseGuards(SuperUserGuard)
   @Post()
   async create(@Body() createBookingDto: CreateBookingDto) {
     await this.bookingsService.create(createBookingDto);
-  }
-
-  @Get('sent')
-  @UseGuards(CustomAuthGuard)
-  async fromMe(@Request() req): Promise<Booking[]> {
-    return this.bookingsService.findByFromAddress(req.user.idAddress);
-  }
-
-  @Get('recvd')
-  @UseGuards(CustomAuthGuard)
-  async toMe(@Request() req): Promise<Booking[]> {
-    return this.bookingsService.findByToUsername(req.user.username);
   }
 
   @UseGuards(SuperUserGuard)
@@ -71,21 +76,10 @@ export class BookingsController {
     return this.bookingsService.findOne(id);
   }
 
-  // @UseGuards(SuperUserGuard)
-  @Get('from/:fromAddress')
-  async findByFromAddress(@Param('fromAddress') fromAddress: string): Promise<Booking[]> {
-    return this.bookingsService.findByFromAddress(fromAddress);
-  }
-
   @UseGuards(SuperUserGuard)
   @Delete(':id')
   async delete(@Param('id') id: string) {
     return this.bookingsService.delete(id);
   }
 
-  @Post('request')
-  @UseGuards(CustomAuthGuard)
-  async makeRequest(@Request() req) {
-    return this.bookingsService.makeRequest(req.user, req.body);
-  }
 }

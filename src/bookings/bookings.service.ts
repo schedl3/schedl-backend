@@ -28,12 +28,27 @@ export class BookingsService {
     return this.BookingModel.findOne({ _id: id }).exec();
   }
 
-  async findByFromAddress(fromAddress: string): Promise<Booking[]> {
-    return this.BookingModel.find({ fromAddress }).exec();
-  }
-
-  async findByToUsername(toUsername: string): Promise<Booking[]> {
-    return this.BookingModel.find({ toUsername }).exec();
+  async findMine(fromAddress: string | null, toUsername: string | null): Promise<Booking[]> {
+    if (!fromAddress && !toUsername) {
+      throw new Error("At least one of 'fromAddress' or 'toUsername' must be provided.");
+    }
+  
+    let query: any = {};
+  
+    if (fromAddress === null) {
+      query = { toUsername };
+    } else if (toUsername === null) {
+      query = { fromAddress };
+    } else {
+      query = {
+        $or: [
+          { fromAddress },
+          { toUsername },
+        ],
+      };
+    }
+  
+    return this.BookingModel.find(query).exec();
   }
 
   async delete(id: string) {
@@ -82,7 +97,7 @@ export class BookingsService {
     const beginningOfWeek = meetingDateTime.startOf('week');
     const startMeet = meetingDateTime.diff(beginningOfWeek, 'minutes').minutes / 60;
     const endMeet = startMeet + lengthMinutes / 60;
-    if (times.some(([{ start, end }]) => start <= startMeet && end >= endMeet)) {
+    if (times.some(({ start, end }, _idx, _arr) => start <= startMeet && end >= endMeet)) {
       // return `Hello, ${user.username}! You requested ${toUser.username}`;
     } else {
       throw new Error("Meeting time is not in schedule");
