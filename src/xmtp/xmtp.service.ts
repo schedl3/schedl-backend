@@ -82,7 +82,12 @@ export class XmtpService {
         onConfirmation('rejected');
         return;
       } else {
-        sent = await conversation.send("Please reply with 'confirm' or 'reject'");
+        try {
+          sent = await conversation.send("Please reply with 'confirm' or 'reject'");
+        } catch (error) {
+          console.error(`Error sending/awaiting conversation, abort confirming: ${error}`);
+        }
+        return;
       }
     }
   }
