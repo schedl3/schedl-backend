@@ -146,13 +146,14 @@ export class UsersService {
       throw new Error('User not found');
     }
     user.idAddressIsPublic = idAddressIsPublic;
-    await this.userModel.updateOne({ idAddress }, { idAddressIsPublic });
+    await this.userModel.updateOne({ idAddress }, { idAddressIsPublic, ethereumAddress: idAddressIsPublic ? idAddress : '' });
     return user;
   }
 
   async getProfileByUsername(username: string): Promise<Partial<User> | undefined> {
+    // TODO -idAddress when !idAddressIsPublic
     const user = await this.userModel.findOne({ username })
-      .select('-password -assistantXmtpAddress -dateCreated -idAddressIsPublic')
+      .select('-password -schedule -tz -assistantXmtpAddress -dateCreated -idAddressIsPublic')
       .exec();
     if (!user) {
       throw new Error('User not found');
@@ -160,6 +161,15 @@ export class UsersService {
     return user;
   }
 
+  async getScheduleByUsername(username: string): Promise<Partial<User> | undefined> {
+    const user = await this.userModel.findOne({ username })
+      .select('-password -idAddres -assistantXmtpAddress -dateCreated -idAddressIsPublic')
+      .exec();
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return user;
+  }
   async create(user: Partial<UserDocument>): Promise<User> {
     const newUser = new this.userModel(user);
     return newUser.save();

@@ -43,14 +43,11 @@ export class User {
   @Prop()
   schedule: Schedule;
 
-  // @Prop({ index: true })
-  // ethereumAddress: string;
+  @Prop({ index: true })
+  ethereumAddress: string;
 
   @Prop()
   twitterUsername: string;
-
-  // @Prop()
-  // emailAddress: string;
 
   @Prop()
   bio: string;

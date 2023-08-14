@@ -59,7 +59,7 @@ export class BookingsService {
   }
 
   async availabilityByUsername(username: string, tz: string): Promise<Record<string, Array<string[2][]>>> {
-    const user = await this.usersService.getProfileByUsername(username);
+    const user = await this.usersService.getScheduleByUsername(username);
     console.log(user);
     if (!user) {
       throw new Error("User does not exist");
