@@ -6,7 +6,7 @@ export class TokenPaymentService {
   private tokenContractAddress: string;
 
   constructor(
-  ) {
+    ) {
     if (process.env.NODE_ENV === 'production') {
       this.tokenContractAddress = process.env.PRODUCTION_TOKEN_CONTRACT_ADDRESS;
     } else {
@@ -18,7 +18,7 @@ export class TokenPaymentService {
     }
   }
 
-  async getTokenBalance(ethereumAddress: string): Promise<number> {
+  async getDepositedTokens(ethereumAddress: string): Promise<number> {
     let provider;
 
     if (process.env.NODE_ENV === 'production') {
