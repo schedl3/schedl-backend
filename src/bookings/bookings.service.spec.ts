@@ -42,6 +42,7 @@ const mockBooking = {
 const mockUser: User = {
   username: "superuser",
   idAddress: "0x78a74b5D1A86704c573163C3aafB6e7234c9Da1e",
+  ethereumAddress: "0x78a74b5D1A86704c573163C3aafB6e7234c9Da1e",
   idAddressIsPublic: true,
   schedule: {
     Sun: "",
