@@ -7,6 +7,7 @@ import { XmtpModule } from './xmtp/xmtp.module';
 import { WalletsModule } from './wallets/wallets.module';
 import { XmtpService } from './xmtp/xmtp.service';
 import { AppController } from './app.controller';
+import { TokenPaymentModule } from './token-payment/token-payment.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AppController } from './app.controller';
     UsersModule,
     XmtpModule,
     WalletsModule,
+    TokenPaymentModule,
   ],
   controllers: [AppController],
   providers: [XmtpService],
