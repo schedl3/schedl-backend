@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
 import { ethers } from 'ethers';
 
 @Injectable()
@@ -7,7 +6,6 @@ export class TokenPaymentService {
   private tokenContractAddress: string;
 
   constructor(
-    private readonly httpService: HttpService
   ) {
     if (process.env.NODE_ENV === 'production') {
       this.tokenContractAddress = process.env.PRODUCTION_TOKEN_CONTRACT_ADDRESS;
