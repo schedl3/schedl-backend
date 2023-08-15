@@ -1,7 +1,6 @@
 import { Controller, Get, Patch, Req, Res, Post, Session, UseGuards, Query, BadRequestException, Param } from '@nestjs/common';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { AuthGuard } from '@nestjs/passport';
-import { CustomAuthGuard } from './auth/auth.guard';
 import { AuthService } from './auth/auth.service';
 import { BookingsService } from './bookings/bookings.service';
 import { XmtpService } from './xmtp/xmtp.service';
