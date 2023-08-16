@@ -3,17 +3,16 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth/auth.service';
 import { BookingsService } from './bookings/bookings.service';
-// import { XmtpService } from './xmtp/xmtp.service';
 import { UsersService } from './users/users.service';
 import { UserDocument } from './users/schemas/user.schema';
 import { SessionNonceStore } from 'passport-ethereum-siwe';
+import * as fs from 'fs';
 
 @Controller()
 export class AppController {
   constructor(
     private authService: AuthService,
     private bookingsService: BookingsService,
-    // private xmtpService: XmtpService,
     private usersService: UsersService,
   ) { }
 
@@ -68,6 +67,14 @@ export class AppController {
   @UseGuards(AuthGuard('twitter'))
   twitterCallback(@Session() session: { views?: number }, @Req() req, @Res() res) {
     res.redirect('https://localhost:3130/schedl-ui');
+  }
+
+  @Get('user/:username')
+  async getUserPage(@Param('username') username: string, @Res() res) {
+    const filePath = process.env.NEXT_OUT_DIR + '/user/[username].html';
+    const htmlContent = await fs.promises.readFile(filePath, 'utf-8');
+    res.setHeader('Content-Type', 'text/html');
+    res.send(htmlContent);
   }
 
   @UseGuards(JwtAuthGuard)

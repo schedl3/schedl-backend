@@ -5,7 +5,6 @@ import * as connectMongoDbSession from 'connect-mongodb-session';
 import { AppModule } from './app.module';
 import { UsersService } from './users/users.service';
 import * as fs from 'fs';
-import { config } from 'dotenv';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
