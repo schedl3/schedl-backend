@@ -64,7 +64,7 @@ export class BookingsService {
     if (!user) {
       throw new Error("User does not exist");
     }
-    const ranges = transformScheduleRangesFromTz(toWeekHourRanges(user.schedule), user.tz, tz);
+    const ranges = user.schedule ? transformScheduleRangesFromTz(toWeekHourRanges(user.schedule), user.tz, tz) : [];
     return availability(ranges, tz);
   }
 
