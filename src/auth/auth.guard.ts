@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { config } from 'dotenv';
 
 @Injectable()
 export class CustomAuthGuard implements CanActivate {

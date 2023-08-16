@@ -8,11 +8,7 @@ import { TwitterStrategy } from './twitter.strategy';
 import { UsersModule } from '../users/users.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { config } from 'dotenv';
-
 import { TwitterProfile, TwitterProfileSchema } from './twitter-profile.schema';
-
-config();
 
 @Module({
   imports: [

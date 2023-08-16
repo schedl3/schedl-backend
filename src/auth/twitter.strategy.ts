@@ -5,10 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/schemas/user.schema';
-import { config } from 'dotenv';
 import { TwitterProfile, TwitterProfileSchema } from './twitter-profile.schema';
-
-config();
 
 @Injectable()
 export class TwitterStrategy extends PassportStrategy(Strategy, 'twitter') {
