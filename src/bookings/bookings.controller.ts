@@ -51,6 +51,9 @@ export class BookingsController {
   @UseGuards(CustomAuthGuard)
   async fromMe(@Param('toOrFrom') toOrFrom: string, @Request() req): Promise<Booking[]> {
     if (toOrFrom === 'to') {
+      if (!req.user.username) {
+        return [];
+      }
       return this.bookingsService.findMine(null, req.user.username);
     } else if (toOrFrom === 'from') {
       return this.bookingsService.findMine(req.user.idAddress, null);

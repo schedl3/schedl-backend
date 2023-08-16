@@ -76,6 +76,10 @@ export class UsersService {
       // prevent squatting
       throw new Error('Username can only be set if it is currently empty.');
     };
+    const userExists = await this.userModel.findOne({ username });
+    if (userExists) {
+      throw new Error('Username already taken');
+    }
 
     user.username = username;
     await this.userModel.updateOne({ idAddress }, { username });

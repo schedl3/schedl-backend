@@ -28,7 +28,7 @@ export class Schedule {
 
 @Schema()
 export class User {
-  @Prop({ index: true, unique: true })
+  @Prop({ index: true })
   username: string;
 
   @Prop({ index: true, unique: true })
