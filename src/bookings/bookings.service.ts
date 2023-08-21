@@ -100,7 +100,8 @@ export class BookingsService {
     if (times.some(({ start, end }, _idx, _arr) => start <= startMeet && end >= endMeet)) {
       // return `Hello, ${user.username}! You requested ${toUser.username}`;
     } else {
-      throw new Error("Meeting time is not in schedule");
+      // throw new Error("Meeting time is not in schedule");
+      console.log("Meeting time is not in schedule");
     }
 
     const booking: CreateBookingDto = {
