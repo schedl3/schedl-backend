@@ -22,9 +22,12 @@ export class TokenPaymentService {
     let provider;
 
     if (process.env.NODE_ENV === 'production') {
-      provider = new ethers.providers.JsonRpcProvider(`https://mainnet.infura.io/v3/${process.env.INFURA_API_SECRET}`);
+      // TODO - use mainnet
+      // provider = new ethers.providers.JsonRpcProvider(`https://linea.infura.io/v3/${process.env.INFURA_API_KEY}`);
+      provider = new ethers.providers.JsonRpcProvider(`https://linea-goerli.infura.io/v3/${process.env.INFURA_API_KEY}`);
     } else {
-      provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+      provider = new ethers.providers.JsonRpcProvider(`https://linea-goerli.infura.io/v3/${process.env.INFURA_API_KEY}`);
+      // provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
     }
 
     const abi = [
