@@ -37,7 +37,9 @@ export class XmtpService {
     const isOnProdNetwork = await xmtp.canMessage(addressToSendTo);
     console.log(addressToSendTo, "Can message: " + isOnProdNetwork);
     if (!isOnProdNetwork) {
-      throw new Error("Address is not on production network");
+      // throw new Error("Address is not on production network");
+      console.log("Address is not on production network");
+      return;
     }
     const conversation = await xmtp.conversations.newConversation(addressToSendTo);
     console.log("Conversation created", conversation);
@@ -53,7 +55,9 @@ export class XmtpService {
     const isOnProdNetwork = await xmtp.canMessage(addressToSendTo);
     console.log(addressToSendTo, "Can message: " + isOnProdNetwork);
     if (!isOnProdNetwork) {
-      throw new Error("Address is not on production network");
+      // throw new Error("Address is not on production network");
+      console.log("Address is not on production network");
+      return;
     }
     const conversation = await xmtp.conversations.newConversation(addressToSendTo);
     console.log("Conversation created", conversation);
