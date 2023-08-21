@@ -66,7 +66,7 @@ export class AppController {
   @Get('oauth/callback/twitter')
   @UseGuards(AuthGuard('twitter'))
   twitterCallback(@Session() session: { views?: number }, @Req() req, @Res() res) {
-    res.redirect('https://localhost:3130/schedl-ui');
+    res.redirect('/schedl-ui');
   }
 
   @Get('user/:username')
